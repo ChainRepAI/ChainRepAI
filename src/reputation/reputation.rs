@@ -1,6 +1,13 @@
+use std::time::{Duration, SystemTime, UNIX_EPOCH};
+
+use solana_client::rpc_response::RpcConfirmedTransactionStatusWithSignature;
+
+use crate::wallet::wallet::Wallet;
+
 pub struct Reputation {
     pub items: Vec<ReputationItem>,
 }
+
 impl Reputation {
     pub fn new() -> Self {
         Self { items: vec![] }
