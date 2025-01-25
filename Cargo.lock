@@ -9,6 +9,7 @@ dependencies = [
  "actix-web",
  "solana-client",
  "solana-sdk",
+ "tokio",
 ]
 
 [[package]]
