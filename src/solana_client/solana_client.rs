@@ -22,4 +22,11 @@ impl SolanaClient {
     pub async fn get_account_info(&self, pub_key: &Pubkey) -> Result<Account, ClientError> {
         self.client.get_account(pub_key).await
     }
+
+    pub async fn get_transaction_history(
+        &self,
+        pub_key: &Pubkey,
+    ) -> Result<Vec<RpcConfirmedTransactionStatusWithSignature>, ClientError> {
+        self.client.get_signatures_for_address(pub_key).await
+    }
 }
