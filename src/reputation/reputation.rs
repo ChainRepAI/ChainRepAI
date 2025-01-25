@@ -5,6 +5,14 @@ impl Reputation {
     pub fn new() -> Self {
         Self { items: vec![] }
     }
+
+    pub fn calc_reputation(&mut self, wallet: &Wallet) {
+        self.items.push((&wallet.account_balance).into());
+        self.items.push((&wallet.transaction_history).into());
+        if let Some(first_tx) = wallet.transaction_history.first() {
+            self.items.push(first_tx.into());
+        }
+    }
 }
 
 enum ReputationLevel {
@@ -17,6 +25,7 @@ struct ReputationItem {
     level: ReputationLevel,
     reasoning: Vec<String>,
 }
+
 impl From<&u64> for ReputationItem {
     fn from(bal: &u64) -> Self {
         let (level, reasoning) = match *bal {
