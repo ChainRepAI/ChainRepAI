@@ -10,3 +10,10 @@ use std::env;
 pub struct SolanaClient {
     client: RpcClient,
 }
+impl SolanaClient {
+    pub fn new() -> Self {
+        Self {
+            client: RpcClient::new(env::var("RPC_URL").expect("rpc url should be set")),
+        }
+    }
+}
