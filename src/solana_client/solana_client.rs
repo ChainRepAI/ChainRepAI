@@ -29,4 +29,16 @@ impl SolanaClient {
     ) -> Result<Vec<RpcConfirmedTransactionStatusWithSignature>, ClientError> {
         self.client.get_signatures_for_address(pub_key).await
     }
+
+    pub async fn get_token_accounts(
+        &self,
+        pub_key: &Pubkey,
+    ) -> Result<Vec<RpcKeyedAccount>, ClientError> {
+        self.client
+            .get_token_accounts_by_owner(
+                pub_key,
+                solana_client::rpc_request::TokenAccountsFilter::ProgramId(*pub_key),
+            )
+            .await
+    }
 }
