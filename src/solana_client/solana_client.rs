@@ -16,4 +16,10 @@ impl SolanaClient {
             client: RpcClient::new(env::var("RPC_URL").expect("rpc url should be set")),
         }
     }
+    pub async fn get_account_balance(&self, pub_key: &Pubkey) -> Result<u64, ClientError> {
+        self.client.get_balance(pub_key).await
+    }
+    pub async fn get_account_info(&self, pub_key: &Pubkey) -> Result<Account, ClientError> {
+        self.client.get_account(pub_key).await
+    }
 }
