@@ -81,3 +81,36 @@ impl From<&Vec<RpcConfirmedTransactionStatusWithSignature>> for ReputationItem {
         Self { level, reasoning }
     }
 }
+
+impl From<&RpcConfirmedTransactionStatusWithSignature> for ReputationItem {
+    fn from(first_transaction: &RpcConfirmedTransactionStatusWithSignature) -> Self {
+        let days_wallet_active = match first_transaction.block_time {
+            Some(tx_time) => {
+                let timestamp_time = UNIX_EPOCH + Duration::from_secs(tx_time as u64);
+                let now = SystemTime::now();
+
+                now.duration_since(timestamp_time)
+                    .expect("Invalid timestamp")
+                    .as_secs()
+                    / (24 * 3600)
+            }
+            None => 0,
+        };
+        let (level, reasoning) = match days_wallet_active {
+            v if v == 0 => (ReputationLevel::None, vec!["Fresh wallet".to_string()]),
+            v if v < 7 => (
+                ReputationLevel::Low,
+                vec!["Wallet less than a week old".to_string()],
+            ),
+            v if v < 30 => (
+                ReputationLevel::Medium,
+                vec!["Wallet less than a month old".to_string()],
+            ),
+            _ => (
+                ReputationLevel::High,
+                vec!["Wallet older than a month".to_string()],
+            ),
+        };
+        Self { level, reasoning }
+    }
+}
