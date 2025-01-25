@@ -1,8 +1,14 @@
 pub struct Reputation {
-    items: Vec<ReputationItem>,
+    pub items: Vec<ReputationItem>,
 }
 
+enum ReputationLevel {
+    High,
+    Medium,
+    Low,
+    None,
+}
 struct ReputationItem {
-    score: u64,
+    level: ReputationLevel,
     reasoning: Vec<String>,
 }
