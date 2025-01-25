@@ -1,3 +1,3 @@
-mod reputation;
-mod solana_client;
-mod wallet;
+pub mod reputation;
+pub mod solana_client;
+pub mod wallet;
