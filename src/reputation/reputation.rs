@@ -1,6 +1,11 @@
 pub struct Reputation {
     pub items: Vec<ReputationItem>,
 }
+impl Reputation {
+    pub fn new() -> Self {
+        Self { items: vec![] }
+    }
+}
 
 enum ReputationLevel {
     High,
