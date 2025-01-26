@@ -93,7 +93,7 @@ impl Reputation {
 }
 
 #[derive(Serialize)]
-pub enum ReputationLevel {
+pub enum PenaltySeverity {
     High,
     Medium,
     Low,
