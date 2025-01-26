@@ -5,6 +5,12 @@ use solana_client::rpc_response::RpcConfirmedTransactionStatusWithSignature;
 
 use crate::wallet::wallet::Wallet;
 
+pub struct WalletBalance(u64);
+
+pub struct TxPerHour(i64);
+
+pub struct DaysSinceLastBlock(u64);
+
 pub struct Reputation {
     pub items: Vec<ReputationItem>,
 }
