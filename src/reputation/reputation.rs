@@ -21,11 +21,22 @@ impl Reputation {
     }
 
     pub fn calc_reputation(&mut self, wallet: &Wallet) {
-        self.items.push((&wallet.account_balance).into());
-        self.items.push((&wallet.transaction_history).into());
-        if let Some(first_tx) = wallet.transaction_history.first() {
-            self.items.push(first_tx.into());
-        }
+
+    /// Calculates transaction volume over last 1000 transactions
+    pub fn transaction_volume(&self, wallet: &Wallet) -> TxPerHour {
+        let transaction_history = &wallet.transaction_history;
+        let num_hours = transaction_history
+            .first()
+            .and_then(|first_tx| first_tx.block_time)
+            .zip(
+                transaction_history
+                    .last()
+                    .and_then(|last_tx| last_tx.block_time),
+            )
+            .map(|(first_tx_time, last_tx_time)| (first_tx_time - last_tx_time).abs() / 3600)
+            .unwrap_or(0);
+        TxPerHour(transaction_history.len() as i64 / num_hours)
+    }
     }
 }
 
@@ -72,21 +83,9 @@ impl From<&u64> for ReputationItem {
 /// Good transaction volume indicates high reputation
 /// Too high volume indicates automation and hence, lower reputation
 /// No volume indicates no reputation
-impl From<&Vec<RpcConfirmedTransactionStatusWithSignature>> for ReputationItem {
-    fn from(transaction_history: &Vec<RpcConfirmedTransactionStatusWithSignature>) -> Self {
-        let num_hours = transaction_history
-            .first()
-            .and_then(|first_tx| first_tx.block_time)
-            .zip(
-                transaction_history
-                    .last()
-                    .and_then(|last_tx| last_tx.block_time),
-            )
-            .map(|(first_tx_time, last_tx_time)| (first_tx_time - last_tx_time).abs() / 3600)
-            .unwrap_or(0);
-        let tx_per_hour = transaction_history.len() as i64 / num_hours;
-
-        let (level, reasoning) = match tx_per_hour {
+impl From<TxPerHour> for ReputationItem {
+    fn from(tx_per_hour: TxPerHour) -> Self {
+        let (level, reasoning) = match tx_per_hour.0 {
             v if v == 0 => (
                 ReputationLevel::None,
                 vec!["No transaction volume".to_string()],
@@ -104,7 +103,6 @@ impl From<&Vec<RpcConfirmedTransactionStatusWithSignature>> for ReputationItem {
                 vec!["Transaction volume too high".to_string()],
             ),
         };
-
         Self { level, reasoning }
     }
 }
