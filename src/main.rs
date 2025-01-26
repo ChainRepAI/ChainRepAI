@@ -1,4 +1,12 @@
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+use serde::Serialize;
+use ChainRepAI::{reputation::reputation::{Reputation, ReputationItem, ReputationLevel}, solana_client::solana_client::SolanaClient, wallet::wallet::Wallet};
+
+#[derive(Serialize)]
+struct ReputationResponse {
+    wallet_addr: String,
+    reputation_items: Vec<ReputationItem>,
+    average_reputation: ReputationLevel,
+}
 
 #[get("/health")]
 async fn health_check() -> impl Responder {
