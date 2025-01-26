@@ -1,7 +1,11 @@
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use dotenv::dotenv;
 use serde::Serialize;
-use ChainRepAI::{reputation::reputation::{Reputation, ReputationItem, ReputationLevel}, solana_client::solana_client::SolanaClient, wallet::wallet::Wallet};
+use ChainRepAI::{
+    reputation::reputation::{Reputation, ReputationItem, ReputationLevel},
+    solana_client::solana_client::SolanaClient,
+    wallet::wallet::Wallet,
+};
 
 #[derive(Serialize)]
 struct ReputationResponse {
