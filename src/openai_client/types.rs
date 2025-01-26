@@ -38,3 +38,11 @@ pub struct FunctionCall {
     pub name: String,
     pub arguments: String,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Usage {
+    pub prompt_tokens: i32,
+    pub completion_tokens: i32,
+    pub total_tokens: i32,
+    pub completion_tokens_details: CompletionTokensDetails,
+}
