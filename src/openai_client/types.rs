@@ -46,3 +46,10 @@ pub struct Usage {
     pub total_tokens: i32,
     pub completion_tokens_details: CompletionTokensDetails,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct CompletionTokensDetails {
+    pub reasoning_tokens: i32,
+    pub accepted_prediction_tokens: i32,
+    pub rejected_prediction_tokens: i32,
+}
