@@ -3,8 +3,9 @@ use solana_client::{
     nonblocking::rpc_client::RpcClient,
     rpc_response::{RpcConfirmedTransactionStatusWithSignature, RpcKeyedAccount},
 };
-use solana_sdk::{account::Account, pubkey::Pubkey};
-use std::env;
+use solana_sdk::{account::Account, pubkey::Pubkey, signature::Signature};
+use solana_transaction_status::{EncodedConfirmedTransactionWithStatusMeta, UiTransactionEncoding};
+use std::{env, str::FromStr};
 
 pub struct SolanaClient {
     client: RpcClient,
@@ -41,6 +42,17 @@ impl SolanaClient {
                 pub_key,
                 solana_client::rpc_request::TokenAccountsFilter::ProgramId(*pub_key),
             )
+            .await
+    }
+
+    pub async fn get_transaction(
+        &self,
+        signature: String,
+    ) -> Result<EncodedConfirmedTransactionWithStatusMeta, ClientError> {
+        let signature =
+            Signature::from_str(&signature).expect("Should be able to create signature");
+        self.client
+            .get_transaction(&signature, UiTransactionEncoding::Json)
             .await
     }
 }
