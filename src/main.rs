@@ -2,7 +2,9 @@ use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use dotenv::dotenv;
 use serde::Serialize;
 use ChainRepAI::{
-    reputation::reputation::Reputation, solana_client::solana_client::SolanaClient,
+    openai_client::{openai_client::OpenAIClient, types::GeneratedCaseReportSections},
+    reputation::reputation::Reputation,
+    solana_client::solana_client::SolanaClient,
     wallet::wallet::Wallet,
 };
 
@@ -10,6 +12,7 @@ use ChainRepAI::{
 struct ReputationResponse {
     wallet_addr: String,
     reputation: Reputation,
+    case_report: GeneratedCaseReportSections,
 }
 
 #[get("/health")]
@@ -23,9 +26,12 @@ async fn wallet_reputation(wallet_addr: web::Path<String>) -> impl Responder {
     let solana_client = SolanaClient::new();
     let wallet = Wallet::new(wallet_addr.as_str(), &solana_client).await;
     let reputation = Reputation::new_from_wallet(&wallet);
+    let openai_client = OpenAIClient::new();
+    let case_report = openai_client.generate_case_report(&reputation).await;
     let reputation_response = ReputationResponse {
         wallet_addr: wallet_addr.to_string(),
         reputation,
+        case_report,
     };
 
     HttpResponse::Ok().json(reputation_response)
