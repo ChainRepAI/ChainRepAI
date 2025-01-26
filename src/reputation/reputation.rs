@@ -10,6 +10,34 @@ pub struct TxPerHour(i64);
 
 pub struct DaysSinceLastBlock(u64);
 
+#[derive(Serialize)]
+pub enum RatingClassification {
+    AAA,
+    AA,
+    A,
+    BBB,
+    BB,
+    B,
+    CCC,
+    CC,
+    C,
+}
+
+impl From<i32> for RatingClassification {
+    fn from(rating_score: i32) -> Self {
+        match rating_score {
+            s if s < 200 => RatingClassification::C,
+            s if s < 300 => RatingClassification::CC,
+            s if s < 400 => RatingClassification::CCC,
+            s if s < 500 => RatingClassification::B,
+            s if s < 600 => RatingClassification::BB,
+            s if s < 700 => RatingClassification::BBB,
+            s if s < 800 => RatingClassification::A,
+            s if s < 900 => RatingClassification::AA,
+            _ => RatingClassification::AAA,
+        }
+    }
+}
 pub struct Reputation {
     pub items: Vec<ReputationItem>,
 }
