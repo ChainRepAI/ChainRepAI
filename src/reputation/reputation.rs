@@ -1,5 +1,6 @@
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+use serde::Serialize;
 use solana_client::rpc_response::RpcConfirmedTransactionStatusWithSignature;
 
 use crate::wallet::wallet::Wallet;
@@ -22,29 +23,32 @@ impl Reputation {
     }
 }
 
-enum ReputationLevel {
+#[derive(Serialize)]
+pub enum ReputationLevel {
     High,
     Medium,
     Low,
     None,
 }
-struct ReputationItem {
+
+#[derive(Serialize)]
+pub struct ReputationItem {
     level: ReputationLevel,
     reasoning: Vec<String>,
 }
 
 impl From<&u64> for ReputationItem {
     fn from(bal: &u64) -> Self {
-        let (level, reasoning) = match *bal {
-            b if b < 1 => (
+        let (level, mut reasoning) = match *bal {
+            b if b < 001000000000 => (
                 ReputationLevel::None,
                 vec!["Balance < 1 Solana".to_string()],
             ),
-            b if b < 10 => (
+            b if b < 010000000000 => (
                 ReputationLevel::Medium,
                 vec!["Balance between 1 and 10 Solana".to_string()],
             ),
-            b if b < 100 => (
+            b if b < 100000000000 => (
                 ReputationLevel::Medium,
                 vec!["Balance between 10 and 100 Solana".to_string()],
             ),
@@ -53,6 +57,7 @@ impl From<&u64> for ReputationItem {
                 vec!["Balance >= 100 Solana".to_string()],
             ),
         };
+        reasoning.push(format!("Solana balance: {:?}", bal));
 
         Self { level, reasoning }
     }
@@ -80,11 +85,11 @@ impl From<&Vec<RpcConfirmedTransactionStatusWithSignature>> for ReputationItem {
                 ReputationLevel::None,
                 vec!["No transaction volume".to_string()],
             ),
-            v if v < 10 => (
+            v if v < 5 => (
                 ReputationLevel::Medium,
-                vec!["Low transaction volume".to_string()],
+                vec!["Low to Medium transaction volume".to_string()],
             ),
-            v if v < 100 => (
+            v if v < 25 => (
                 ReputationLevel::High,
                 vec!["Reasonable level of transaction volume".to_string()],
             ),
@@ -104,7 +109,6 @@ impl From<&RpcConfirmedTransactionStatusWithSignature> for ReputationItem {
             Some(tx_time) => {
                 let timestamp_time = UNIX_EPOCH + Duration::from_secs(tx_time as u64);
                 let now = SystemTime::now();
-
                 now.duration_since(timestamp_time)
                     .expect("Invalid timestamp")
                     .as_secs()
