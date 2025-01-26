@@ -16,3 +16,25 @@ pub struct CaseReport {
     sections: GeneratedCaseReportSections,
     report_creation_date: DateTime<Utc>,
 }
+
+impl CaseReport {
+    pub async fn new(
+        openai_client: &OpenAIClient,
+        reputation: Reputation,
+        wallet: Wallet,
+    ) -> Result<Self> {
+        let title = format!(
+            "Reputation Ratings Analysis of Wallet: {:?}",
+            wallet.wallet_addr
+        );
+        let sections = openai_client.generate_case_report(&reputation).await?;
+
+        Ok(CaseReport {
+            title,
+            rating_classification: reputation.rating_classification,
+            rating_score: reputation.rating_score,
+            sections,
+            report_creation_date: Utc::now(),
+        })
+    }
+}
