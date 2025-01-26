@@ -1,4 +1,4 @@
-use std::time::{Duration, SystemTime, UNIX_EPOCH};
+use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::Serialize;
 use solana_client::rpc_response::RpcConfirmedTransactionStatusWithSignature;
