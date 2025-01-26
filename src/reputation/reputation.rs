@@ -135,27 +135,27 @@ impl From<WalletBalance> for ReputationItem {
 /// Good transaction volume indicates high reputation
 /// Too high volume indicates automation and hence, lower reputation
 /// No volume indicates no reputation
-impl From<TxPerHour> for ReputationItem {
+impl From<TxPerHour> for ReputationPenalty {
     fn from(tx_per_hour: TxPerHour) -> Self {
-        let (level, reasoning) = match tx_per_hour.0 {
+        let (severity, reasoning) = match tx_per_hour.0 {
             v if v == 0 => (
-                ReputationLevel::None,
+                PenaltySeverity::High,
                 vec!["No transaction volume".to_string()],
             ),
             v if v < 5 => (
-                ReputationLevel::Medium,
+                PenaltySeverity::Low,
                 vec!["Low to Medium transaction volume".to_string()],
             ),
             v if v < 25 => (
-                ReputationLevel::High,
+                PenaltySeverity::None,
                 vec!["Reasonable level of transaction volume".to_string()],
             ),
             _ => (
-                ReputationLevel::Low,
+                PenaltySeverity::High,
                 vec!["Transaction volume too high".to_string()],
             ),
         };
-        Self { level, reasoning }
+        Self { severity, reasoning }
     }
 }
 
