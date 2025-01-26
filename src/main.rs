@@ -2,16 +2,14 @@ use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use dotenv::dotenv;
 use serde::Serialize;
 use ChainRepAI::{
-    reputation::reputation::{Reputation, ReputationItem, ReputationLevel},
-    solana_client::solana_client::SolanaClient,
+    reputation::reputation::Reputation, solana_client::solana_client::SolanaClient,
     wallet::wallet::Wallet,
 };
 
 #[derive(Serialize)]
 struct ReputationResponse {
     wallet_addr: String,
-    reputation_items: Vec<ReputationItem>,
-    average_reputation: ReputationLevel,
+    reputation: Reputation,
 }
 
 #[get("/health")]
@@ -24,13 +22,12 @@ async fn wallet_reputation(wallet_addr: web::Path<String>) -> impl Responder {
     dotenv().ok();
     let solana_client = SolanaClient::new();
     let wallet = Wallet::new(wallet_addr.as_str(), &solana_client).await;
-    let mut reputation = Reputation::new();
-    reputation.calc_reputation(&wallet);
+    let reputation = Reputation::new_from_wallet(&wallet);
     let reputation_response = ReputationResponse {
         wallet_addr: wallet_addr.to_string(),
-        reputation_items: reputation.items,
-        average_reputation: ReputationLevel::Medium,
+        reputation,
     };
+
     HttpResponse::Ok().json(reputation_response)
 }
 
