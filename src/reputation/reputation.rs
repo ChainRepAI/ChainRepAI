@@ -1,7 +1,6 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::Serialize;
-use solana_client::rpc_response::RpcConfirmedTransactionStatusWithSignature;
 
 use crate::wallet::wallet::Wallet;
 
@@ -21,6 +20,12 @@ impl Reputation {
     }
 
     pub fn calc_reputation(&mut self, wallet: &Wallet) {
+        self.items.push(self.transaction_volume(wallet).into());
+        self.items.push(WalletBalance(wallet.account_balance).into());
+        if let Some(days) = self.dormancy(wallet) {
+            self.items.push(days.into())
+        }
+    }
 
     /// Calculates transaction volume over last 1000 transactions
     pub fn transaction_volume(&self, wallet: &Wallet) -> TxPerHour {
@@ -52,7 +57,6 @@ impl Reputation {
                 let time_diff = current_time.saturating_sub(block_time as u64);
                 DaysSinceLastBlock(time_diff / (60 * 60 * 24))
             })
-    }
     }
 }
 
