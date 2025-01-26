@@ -24,3 +24,11 @@ pub struct ChatMessage {
     pub content: Option<String>,
     pub tool_calls: Option<Vec<ToolCall>>,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ToolCall {
+    pub id: String,
+    #[serde(rename = "type")]
+    pub call_type: String,
+    pub function: FunctionCall,
+}
