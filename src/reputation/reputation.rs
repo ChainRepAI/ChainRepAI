@@ -47,15 +47,31 @@ pub struct Reputation {
 }
 
 impl Reputation {
-    pub fn new() -> Self {
-        Self { items: vec![] }
-    }
+    pub fn new_from_wallet(wallet: &Wallet) -> Self {
+        let mut penalties: Vec<ReputationPenalty> = vec![];
+        // add penalties
+        penalties.push(Reputation::transaction_volume(wallet).into());
+        penalties.push(WalletBalance(wallet.account_balance).into());
+        penalties.push(
+            Reputation::dormancy(wallet)
+                .unwrap_or_else(|| DaysSinceLastBlock(std::u64::MAX))
+                .into(),
+        );
 
-    pub fn calc_reputation(&mut self, wallet: &Wallet) {
-        self.items.push(self.transaction_volume(wallet).into());
-        self.items.push(WalletBalance(wallet.account_balance).into());
-        if let Some(days) = self.dormancy(wallet) {
-            self.items.push(days.into())
+        let mut rating_score = 1000;
+        for penalty in &penalties {
+            rating_score -= match penalty.severity {
+                PenaltySeverity::High => 250,
+                PenaltySeverity::Medium => 150,
+                PenaltySeverity::Low => 50,
+                PenaltySeverity::None => 0,
+            };
+        }
+
+        Self {
+            penalties,
+            rating_score,
+            rating_classification: rating_score.into(),
         }
     }
 
