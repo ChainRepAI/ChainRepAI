@@ -60,7 +60,7 @@ impl Reputation {
     }
 
     /// Calculates transaction volume over last 1000 transactions
-    pub fn transaction_volume(&self, wallet: &Wallet) -> TxPerHour {
+    pub fn transaction_volume(wallet: &Wallet) -> TxPerHour {
         let transaction_history = &wallet.transaction_history;
         let num_hours = transaction_history
             .first()
@@ -75,7 +75,7 @@ impl Reputation {
         TxPerHour(transaction_history.len() as i64 / num_hours)
     }
 
-    pub fn dormancy(&self, wallet: &Wallet) -> Option<DaysSinceLastBlock> {
+    pub fn dormancy(wallet: &Wallet) -> Option<DaysSinceLastBlock> {
         wallet
             .transaction_history
             .last()
