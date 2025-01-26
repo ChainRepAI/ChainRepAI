@@ -159,23 +159,23 @@ impl From<TxPerHour> for ReputationItem {
     }
 }
 
-impl From<DaysSinceLastBlock> for ReputationItem {
+impl From<DaysSinceLastBlock> for ReputationPenalty {
     fn from(days: DaysSinceLastBlock) -> Self {
-        let (level, reasoning) = match days.0 {
+        let (severity, reasoning) = match days.0 {
             d if d == 0 => (
-                ReputationLevel::High,
-                vec!["Very recent activity".to_string()],
+                PenaltySeverity::None,
+                vec!["Recent activity in less than a day".to_string()],
             ),
-            d if d < 7 => (ReputationLevel::Medium, vec!["Recent activity".to_string()]),
+            d if d < 7 => (PenaltySeverity::Low, vec!["Recent activity, less than a week ago".to_string()]),
             d if d < 30 => (
-                ReputationLevel::Low,
-                vec!["Semi-recent activity".to_string()],
+                PenaltySeverity::Medium,
+                vec!["Activity less than a month ago".to_string()],
             ),
             _ => (
-                ReputationLevel::None,
-                vec!["Too many days without activity indicates dormancy".to_string()],
+                PenaltySeverity::High,
+                vec!["No activity within a month".to_string()],
             ),
         };
-        Self { level, reasoning }
+        Self { severity, reasoning }
     }
 }
