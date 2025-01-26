@@ -10,6 +10,31 @@ pub struct TxPerHour(i64);
 
 pub struct DaysSinceLastBlock(u64);
 
+pub struct TransactionFailureRate(f64);
+
+impl TransactionFailureRate {
+    pub fn calculate(wallet: &Wallet) -> Option<Self> {
+        let transaction_history = &wallet.transaction_history;
+        if transaction_history.is_empty() {
+            return None;
+        }
+
+        let total_transactions = transaction_history.len() as f64;
+        let failed_transactions = transaction_history
+            .iter()
+            .filter(|tx| !tx.err.is_some())
+            .count() as f64;
+
+        let failure_rate = if total_transactions == 0.0 {
+            0.0
+        } else {
+            (failed_transactions / total_transactions) * 100.0
+        };
+
+        Some(Self(failure_rate))
+    }
+}
+
 #[derive(Serialize)]
 pub enum RatingClassification {
     AAA,
