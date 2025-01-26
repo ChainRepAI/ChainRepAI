@@ -87,14 +87,16 @@ impl OpenAIClient {
 
         let openai_response = openai_response.error_for_status()?;
         let completion: ChatCompletion = openai_response.json().await?;
-        let choice = completion.choices.first().ok_or_else(|| {
-            Error::msg("No choices available")
-        })?;
-        let content = choice.message.content.clone().ok_or_else(|| {
-            Error::msg("No content available in the message")
-        })?;    
-        let case_report_sections: GeneratedCaseReportSections =
-            serde_json::from_str(&content)?;
+        let choice = completion
+            .choices
+            .first()
+            .ok_or_else(|| Error::msg("No choices available"))?;
+        let content = choice
+            .message
+            .content
+            .clone()
+            .ok_or_else(|| Error::msg("No content available in the message"))?;
+        let case_report_sections: GeneratedCaseReportSections = serde_json::from_str(&content)?;
         Ok(case_report_sections)
     }
 }
