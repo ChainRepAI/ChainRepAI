@@ -21,7 +21,7 @@ async fn wallet_report(wallet_addr: web::Path<String>) -> impl Responder {
 
     match CaseReport::new(&openai_client, reputation, wallet).await {
         Ok(case_report) => HttpResponse::Ok().json(case_report),
-        Err(_) => HttpResponse::InternalServerError().json(""),
+        Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
     }
 }
 
