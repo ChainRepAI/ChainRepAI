@@ -38,8 +38,12 @@ impl From<i32> for RatingClassification {
         }
     }
 }
+
+#[derive(Serialize)]
 pub struct Reputation {
-    pub items: Vec<ReputationItem>,
+    pub penalties: Vec<ReputationPenalty>,
+    pub rating_score: i32,
+    pub rating_classification: RatingClassification,
 }
 
 impl Reputation {
