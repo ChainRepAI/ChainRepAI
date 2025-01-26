@@ -4,11 +4,11 @@ use solana_sdk::{account::Account, pubkey::Pubkey};
 use crate::solana_client::solana_client::SolanaClient;
 
 pub struct Wallet {
-    pub_key: Pubkey,
     pub account_balance: u64,
     pub account_info: Account,
     pub transaction_history: Vec<RpcConfirmedTransactionStatusWithSignature>,
     pub token_accounts: Vec<RpcKeyedAccount>,
+    pub wallet_addr: String,
 }
 
 impl Wallet {
@@ -23,11 +23,11 @@ impl Wallet {
         );
 
         Self {
-            pub_key,
             account_balance: account_balance.unwrap_or_default(),
             account_info: account_info.unwrap_or_default(),
             transaction_history: transaction_history.unwrap_or_default(),
             token_accounts: token_accounts.unwrap_or_default(),
+            wallet_addr: wallet_addr.to_string(),
         }
     }
 }
