@@ -5,10 +5,10 @@ use crate::solana_client::solana_client::SolanaClient;
 
 pub struct Wallet {
     pub_key: Pubkey,
-    account_balance: u64,
-    account_info: Account,
-    transaction_history: Vec<RpcConfirmedTransactionStatusWithSignature>,
-    token_accounts: Vec<RpcKeyedAccount>,
+    pub account_balance: u64,
+    pub account_info: Account,
+    pub transaction_history: Vec<RpcConfirmedTransactionStatusWithSignature>,
+    pub token_accounts: Vec<RpcKeyedAccount>,
 }
 
 impl Wallet {
