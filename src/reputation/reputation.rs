@@ -37,6 +37,22 @@ impl Reputation {
             .unwrap_or(0);
         TxPerHour(transaction_history.len() as i64 / num_hours)
     }
+
+    pub fn dormancy(&self, wallet: &Wallet) -> Option<DaysSinceLastBlock> {
+        wallet
+            .transaction_history
+            .last()
+            .and_then(|last_tx| last_tx.block_time)
+            .map(|block_time| {
+                let current_time = SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .expect("Time went backwards")
+                    .as_secs();
+
+                let time_diff = current_time.saturating_sub(block_time as u64);
+                DaysSinceLastBlock(time_diff / (60 * 60 * 24))
+            })
+    }
     }
 }
 
@@ -107,32 +123,21 @@ impl From<TxPerHour> for ReputationItem {
     }
 }
 
-impl From<&RpcConfirmedTransactionStatusWithSignature> for ReputationItem {
-    fn from(first_transaction: &RpcConfirmedTransactionStatusWithSignature) -> Self {
-        let days_wallet_active = match first_transaction.block_time {
-            Some(tx_time) => {
-                let timestamp_time = UNIX_EPOCH + Duration::from_secs(tx_time as u64);
-                let now = SystemTime::now();
-                now.duration_since(timestamp_time)
-                    .expect("Invalid timestamp")
-                    .as_secs()
-                    / (24 * 3600)
-            }
-            None => 0,
-        };
-        let (level, reasoning) = match days_wallet_active {
-            v if v == 0 => (ReputationLevel::None, vec!["Fresh wallet".to_string()]),
-            v if v < 7 => (
-                ReputationLevel::Low,
-                vec!["Wallet less than a week old".to_string()],
+impl From<DaysSinceLastBlock> for ReputationItem {
+    fn from(days: DaysSinceLastBlock) -> Self {
+        let (level, reasoning) = match days.0 {
+            d if d == 0 => (
+                ReputationLevel::High,
+                vec!["Very recent activity".to_string()],
             ),
-            v if v < 30 => (
-                ReputationLevel::Medium,
-                vec!["Wallet less than a month old".to_string()],
+            d if d < 7 => (ReputationLevel::Medium, vec!["Recent activity".to_string()]),
+            d if d < 30 => (
+                ReputationLevel::Low,
+                vec!["Semi-recent activity".to_string()],
             ),
             _ => (
-                ReputationLevel::High,
-                vec!["Wallet older than a month".to_string()],
+                ReputationLevel::None,
+                vec!["Too many days without activity indicates dormancy".to_string()],
             ),
         };
         Self { level, reasoning }
