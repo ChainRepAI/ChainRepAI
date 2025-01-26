@@ -14,7 +14,9 @@ pub struct TransactionFailureRate(f64);
 
 impl TransactionFailureRate {
     pub fn calculate(wallet: &Wallet) -> Self {
-        let transaction_history: &Vec<solana_client::rpc_response::RpcConfirmedTransactionStatusWithSignature> = &wallet.transaction_history;
+        let transaction_history: &Vec<
+            solana_client::rpc_response::RpcConfirmedTransactionStatusWithSignature,
+        > = &wallet.transaction_history;
         if transaction_history.is_empty() {
             return Self(0.0);
         }
@@ -31,7 +33,7 @@ impl TransactionFailureRate {
             (failed_transactions / total_transactions) * 100.0
         };
 
-       Self(failure_rate)
+        Self(failure_rate)
     }
 }
 
