@@ -70,9 +70,9 @@ pub struct ReputationItem {
     reasoning: Vec<String>,
 }
 
-impl From<&u64> for ReputationItem {
-    fn from(bal: &u64) -> Self {
-        let (level, mut reasoning) = match *bal {
+impl From<WalletBalance> for ReputationItem {
+    fn from(balance: WalletBalance) -> Self {
+        let (level, mut reasoning) = match balance.0 {
             b if b < 001000000000 => (
                 ReputationLevel::None,
                 vec!["Balance < 1 Solana".to_string()],
@@ -90,7 +90,7 @@ impl From<&u64> for ReputationItem {
                 vec!["Balance >= 100 Solana".to_string()],
             ),
         };
-        reasoning.push(format!("Solana balance: {:?}", bal));
+        reasoning.push(format!("Solana balance: {:?}", balance.0));
 
         Self { level, reasoning }
     }
