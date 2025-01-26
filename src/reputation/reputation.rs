@@ -101,8 +101,8 @@ pub enum ReputationLevel {
 }
 
 #[derive(Serialize)]
-pub struct ReputationItem {
-    level: ReputationLevel,
+pub struct ReputationPenalty {
+    severity: PenaltySeverity,
     reasoning: Vec<String>,
 }
 
