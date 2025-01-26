@@ -53,3 +53,12 @@ pub struct CompletionTokensDetails {
     pub accepted_prediction_tokens: i32,
     pub rejected_prediction_tokens: i32,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GeneratedCaseReportSections {
+    summary: String,
+    reputation_strengths: Vec<String>,
+    reputation_challenges: Vec<String>,
+    potential_downgrade_factors: Vec<String>,
+    penalty_breakdown: Vec<String>,
+}
