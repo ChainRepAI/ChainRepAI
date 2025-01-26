@@ -144,7 +144,10 @@ impl From<WalletBalance> for ReputationPenalty {
         };
         reasoning.push(format!("Solana balance: {:?}", balance.0));
 
-        Self { severity, reasoning }
+        Self {
+            severity,
+            reasoning,
+        }
     }
 }
 
@@ -171,7 +174,10 @@ impl From<TxPerHour> for ReputationPenalty {
                 vec!["Transaction volume too high".to_string()],
             ),
         };
-        Self { severity, reasoning }
+        Self {
+            severity,
+            reasoning,
+        }
     }
 }
 
@@ -182,7 +188,10 @@ impl From<DaysSinceLastBlock> for ReputationPenalty {
                 PenaltySeverity::None,
                 vec!["Recent activity in less than a day".to_string()],
             ),
-            d if d < 7 => (PenaltySeverity::Low, vec!["Recent activity, less than a week ago".to_string()]),
+            d if d < 7 => (
+                PenaltySeverity::Low,
+                vec!["Recent activity, less than a week ago".to_string()],
+            ),
             d if d < 30 => (
                 PenaltySeverity::Medium,
                 vec!["Activity less than a month ago".to_string()],
@@ -192,6 +201,9 @@ impl From<DaysSinceLastBlock> for ReputationPenalty {
                 vec!["No activity within a month".to_string()],
             ),
         };
-        Self { severity, reasoning }
+        Self {
+            severity,
+            reasoning,
+        }
     }
 }
