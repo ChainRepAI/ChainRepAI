@@ -13,10 +13,10 @@ pub struct DaysSinceLastBlock(u64);
 pub struct TransactionFailureRate(f64);
 
 impl TransactionFailureRate {
-    pub fn calculate(wallet: &Wallet) -> Option<Self> {
-        let transaction_history = &wallet.transaction_history;
+    pub fn calculate(wallet: &Wallet) -> Self {
+        let transaction_history: &Vec<solana_client::rpc_response::RpcConfirmedTransactionStatusWithSignature> = &wallet.transaction_history;
         if transaction_history.is_empty() {
-            return None;
+            return Self(0.0);
         }
 
         let total_transactions = transaction_history.len() as f64;
@@ -31,7 +31,7 @@ impl TransactionFailureRate {
             (failed_transactions / total_transactions) * 100.0
         };
 
-        Some(Self(failure_rate))
+       Self(failure_rate)
     }
 }
 
