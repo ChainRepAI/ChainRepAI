@@ -32,3 +32,9 @@ pub struct ToolCall {
     pub call_type: String,
     pub function: FunctionCall,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FunctionCall {
+    pub name: String,
+    pub arguments: String,
+}
