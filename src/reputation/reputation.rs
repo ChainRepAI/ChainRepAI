@@ -232,3 +232,30 @@ impl From<DaysSinceLastBlock> for ReputationPenalty {
         }
     }
 }
+
+impl From<TransactionFailureRate> for ReputationPenalty {
+    fn from(failure_rate: TransactionFailureRate) -> Self {
+        let (severity, reasoning) = match failure_rate.0 {
+            f if f > 10.0 => (
+                PenaltySeverity::High,
+                vec!["High transaction failure rate".to_string()],
+            ),
+            f if f > 5.0 => (
+                PenaltySeverity::Medium,
+                vec!["Moderate transaction failure rate".to_string()],
+            ),
+            f if f > 0.0 => (
+                PenaltySeverity::Low,
+                vec!["Low transaction failure rate".to_string()],
+            ),
+            _ => (
+                PenaltySeverity::None,
+                vec!["No transaction failures".to_string()],
+            ),
+        };
+        Self {
+            severity,
+            reasoning,
+        }
+    }
+}
