@@ -28,13 +28,19 @@ async fn wallet_reputation(wallet_addr: web::Path<String>) -> impl Responder {
     let reputation = Reputation::new_from_wallet(&wallet);
     let openai_client = OpenAIClient::new();
     let case_report = openai_client.generate_case_report(&reputation).await;
-    let reputation_response = ReputationResponse {
-        wallet_addr: wallet_addr.to_string(),
-        reputation,
-        case_report,
-    };
 
-    HttpResponse::Ok().json(reputation_response)
+    match case_report {
+        Ok(case_report) => {
+            let reputation_response = ReputationResponse {
+                wallet_addr: wallet_addr.to_string(),
+                reputation,
+                case_report,
+            };
+
+            HttpResponse::Ok().json(reputation_response)
+        }
+        Err(_) => HttpResponse::InternalServerError().json(""),
+    }
 }
 
 #[actix_web::main]
