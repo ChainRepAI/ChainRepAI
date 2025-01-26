@@ -17,3 +17,10 @@ pub struct Choice {
     pub logprobs: Option<serde_json::Value>,
     pub finish_reason: String,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ChatMessage {
+    pub role: String,
+    pub content: Option<String>,
+    pub tool_calls: Option<Vec<ToolCall>>,
+}
