@@ -82,6 +82,7 @@ impl Reputation {
                 .unwrap_or_else(|| DaysSinceLastBlock(std::u64::MAX))
                 .into(),
         );
+        penalties.push(TransactionFailureRate::calculate(&wallet).into());
 
         let mut rating_score = 1000;
         for penalty in &penalties {
