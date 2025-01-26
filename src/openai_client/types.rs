@@ -62,3 +62,9 @@ pub struct GeneratedCaseReportSections {
     potential_downgrade_factors: Vec<String>,
     penalty_breakdown: Vec<String>,
 }
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Message {
+    pub role: String,
+    pub content: String,
+}
