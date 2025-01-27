@@ -171,7 +171,6 @@ impl From<WalletBalance> for ReputationPenalty {
             ),
         };
         reasoning.push(format!("Solana balance: {:?}", balance.0));
-
         Self {
             severity,
             reasoning,
@@ -184,7 +183,7 @@ impl From<WalletBalance> for ReputationPenalty {
 /// No volume indicates no reputation
 impl From<TxPerHour> for ReputationPenalty {
     fn from(tx_per_hour: TxPerHour) -> Self {
-        let (severity, reasoning) = match tx_per_hour.0 {
+        let (severity, mut reasoning) = match tx_per_hour.0 {
             v if v == 0 => (
                 PenaltySeverity::High,
                 vec!["No transaction volume".to_string()],
@@ -202,6 +201,7 @@ impl From<TxPerHour> for ReputationPenalty {
                 vec!["Transaction volume too high".to_string()],
             ),
         };
+        reasoning.push(format!("Transaction volumer per hour: {:?}", tx_per_hour.0));
         Self {
             severity,
             reasoning,
@@ -211,7 +211,7 @@ impl From<TxPerHour> for ReputationPenalty {
 
 impl From<DaysSinceLastBlock> for ReputationPenalty {
     fn from(days: DaysSinceLastBlock) -> Self {
-        let (severity, reasoning) = match days.0 {
+        let (severity, mut reasoning) = match days.0 {
             d if d == 0 => (
                 PenaltySeverity::None,
                 vec!["Recent activity in less than a day".to_string()],
@@ -229,6 +229,7 @@ impl From<DaysSinceLastBlock> for ReputationPenalty {
                 vec!["No activity within a month".to_string()],
             ),
         };
+        reasoning.push(format!("Days since last transactioon: {:?}", days.0));
         Self {
             severity,
             reasoning,
@@ -238,7 +239,7 @@ impl From<DaysSinceLastBlock> for ReputationPenalty {
 
 impl From<TransactionFailureRate> for ReputationPenalty {
     fn from(failure_rate: TransactionFailureRate) -> Self {
-        let (severity, reasoning) = match failure_rate.0 {
+        let (severity, mut reasoning) = match failure_rate.0 {
             f if f > 10.0 => (
                 PenaltySeverity::High,
                 vec!["High transaction failure rate".to_string()],
@@ -256,6 +257,7 @@ impl From<TransactionFailureRate> for ReputationPenalty {
                 vec!["No transaction failures".to_string()],
             ),
         };
+        reasoning.push(format!("Transaction failure rate: {:?}", failure_rate.0));
         Self {
             severity,
             reasoning,
