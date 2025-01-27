@@ -170,7 +170,7 @@ impl From<WalletBalance> for ReputationPenalty {
                 vec!["Balance >= 100 Solana".to_string()],
             ),
         };
-        reasoning.push(format!("Solana balance: {:?}", balance.0));
+        reasoning.push(format!("Solana balance: {:?}", balance.0 / 1_000_000_000));
         Self {
             severity,
             reasoning,
