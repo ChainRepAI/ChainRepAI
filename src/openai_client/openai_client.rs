@@ -9,7 +9,6 @@ use crate::{openai_client::types::Message, reputation::reputation::Reputation};
 use super::types::{ChatCompletion, GeneratedCaseReportSections};
 
 const OPENAI_URL: &str = "https://api.openai.com/v1/chat/completions";
-const PROMPT: &str = "Using the following reputational information about a solana wallet, fill in the required fields. Title should be a short text describing the document.";
 
 pub struct OpenAIClient {
     client: Client,
@@ -35,7 +34,7 @@ impl OpenAIClient {
             .json(&json!({
                 "model": "gpt-4o-mini-2024-07-18",
                 "messages": vec![
-                    Message { role: "system".to_string(), content: PROMPT.to_string() },
+                    Message { role: "system".to_string(), content: env::var("CASE_REPORT_PROMPT").expect("Case report prompt should be set")},
                     Message { role: "user".to_string(), content: to_string(reputation).unwrap() }
                 ],
                 "response_format": {
