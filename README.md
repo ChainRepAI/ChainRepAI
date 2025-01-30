@@ -1,6 +1,10 @@
  # ChainRepAI
 
-<img src="images/banner.png">
+<!-- <img src="images/banner.png" width="600">
+
+ -->
+
+ ![image](images/banner.png)
 
 ## Description
 ChainRepAI is your personal on-chain Solana wallet analyst. Using various indicators, it's able to understand the reputation rating of the provided wallet.
