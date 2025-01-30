@@ -24,7 +24,7 @@ impl TransactionFailureRate {
         let total_transactions = transaction_history.len() as f64;
         let failed_transactions = transaction_history
             .iter()
-            .filter(|tx| !tx.err.is_some())
+            .filter(|tx| tx.err.is_some())
             .count() as f64;
 
         let failure_rate = if total_transactions == 0.0 {
