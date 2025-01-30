@@ -34,7 +34,7 @@ High transaction failure rate may imply lower wallet reputation in several ways:
 - Interaction with poorly written smart contracts
 
 ## Example Generated Report: @frankdegods
-<img src="images/image.png" width="300">
+<img src="images/frank.png" width="300">
 
 #### Wallet Address:
 CRVidEDtEUTYZisCxBZkpELzhQc9eauMLR3FWg74tReL
