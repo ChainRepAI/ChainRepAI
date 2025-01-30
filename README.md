@@ -1,11 +1,16 @@
  # ChainRepAI
 
- <!-- Put Image here, perhaps example -->
+<img src="images/banner.png">
 
 ## Description
 ChainRepAI is your personal on-chain Solana wallet analyst. Using various indicators, it's able to understand the reputation rating of the provided wallet.
 
 This project is, and always will be, Open-Source and 100% free to use.
+
+### Socials
+[Twitter](https://x.com/ChainRepAI)
+<br>
+[YouTube]()
 
 ## Breakdown of the Reputational Indicators
 
