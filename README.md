@@ -60,9 +60,6 @@ The wallet recently engaged in activity less than a week ago, with the last tran
 #### Penalty Breakdown:
 The absence of severe penalties indicates the wallet operates within reasonable transaction volumes, which helps maintain a stable reputation. With an average of 14 transactions per hour, this wallet shows a consistent yet moderate level of activity, reducing risks of sudden or suspicious behavior that might trigger scrutiny. Additionally, the wallet's balance of 4173 Solana significantly exceeds the threshold of 100 Solana, further bolstering its credibility. Low transaction failure rates at 4.2% also suggest careful management of transactions, enhancing user confidence and minimizing exposure to risks associated with technical issues.
 
-## How To Run Locally
-
-
 ## Contributing
 
 Before integrating a new feature, please quickly reach out to us in an issue so we can discuss and coordinate the change.
