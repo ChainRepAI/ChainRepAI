@@ -2,10 +2,11 @@ use chrono::NaiveDateTime;
 use diesel::prelude::{Insertable, Queryable};
 use diesel::sql_types::SqlType;
 use diesel_derive_enum::DbEnum;
+use serde::Serialize;
 use uuid::Uuid;
 use diesel::expression::AsExpression;
 
-#[derive(Debug, AsExpression, DbEnum)]
+#[derive(Debug, AsExpression, DbEnum, Serialize)]
 #[diesel(sql_type = crate::database::schema::sql_types::RatingClassification)]
 pub enum RatingClassification {
     AAA,
@@ -17,6 +18,22 @@ pub enum RatingClassification {
     CCC,
     CC,
     C,
+}
+
+impl From<i32> for RatingClassification {
+    fn from(rating_score: i32) -> Self {
+        match rating_score {
+            s if s < 200 => RatingClassification::C,
+            s if s < 300 => RatingClassification::CC,
+            s if s < 400 => RatingClassification::CCC,
+            s if s < 500 => RatingClassification::B,
+            s if s < 600 => RatingClassification::BB,
+            s if s < 700 => RatingClassification::BBB,
+            s if s < 800 => RatingClassification::A,
+            s if s < 900 => RatingClassification::AA,
+            _ => RatingClassification::AAA,
+        }
+    }
 }
 
 #[derive(Insertable, Queryable, Debug)]

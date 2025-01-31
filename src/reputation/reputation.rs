@@ -2,7 +2,7 @@ use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::Serialize;
 
-use crate::wallet::wallet::Wallet;
+use crate::{database::models::RatingClassification, wallet::wallet::Wallet};
 
 pub struct WalletBalance(u64);
 
@@ -102,22 +102,6 @@ impl TransactionFailureRate {
         };
 
         Self(failure_rate)
-    }
-}
-
-impl From<i32> for RatingClassification {
-    fn from(rating_score: i32) -> Self {
-        match rating_score {
-            s if s < 200 => RatingClassification::C,
-            s if s < 300 => RatingClassification::CC,
-            s if s < 400 => RatingClassification::CCC,
-            s if s < 500 => RatingClassification::B,
-            s if s < 600 => RatingClassification::BB,
-            s if s < 700 => RatingClassification::BBB,
-            s if s < 800 => RatingClassification::A,
-            s if s < 900 => RatingClassification::AA,
-            _ => RatingClassification::AAA,
-        }
     }
 }
 
