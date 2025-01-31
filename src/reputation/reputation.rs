@@ -296,3 +296,61 @@ impl From<TransactionFailureRate> for ReputationPenalty {
         }
     }
 }
+
+impl From<PrioritizationFeesMetrics> for (ReputationPenalty, ReputationPenalty) {
+    fn from(pfm: PrioritizationFeesMetrics) -> Self {
+        let (avg_fee_severity, mut avg_fee_reasoning) = match pfm.avg_fee {
+            f if f > 10.0 => (
+                PenaltySeverity::None,
+                vec!["High average prioritization fee".to_string()],
+            ),
+            f if f > 5.0 => (
+                PenaltySeverity::None,
+                vec!["Medium average prioritization fee".to_string()],
+            ),
+            f if f > 0.0 => (
+                PenaltySeverity::None,
+                vec!["Low average prioritization fee".to_string()],
+            ),
+            _ => (
+                PenaltySeverity::High,
+                vec!["No prioritization fee used".to_string()],
+            ),
+        };
+        avg_fee_reasoning.push(format!("Average prioritization fee: {:?}", pfm.avg_fee));
+
+        let (std_deviation_severity, mut std_deviation_reasoning) = match pfm.std_deviation {
+            f if f > 50.0 => (
+                PenaltySeverity::High,
+                vec!["Very high standard deviation in prioritization fee".to_string()],
+            ),
+            f if f > 25.0 => (
+                PenaltySeverity::Medium,
+                vec!["Medium standard deviation in prioritization fee".to_string()],
+            ),
+            f if f > 5.0 => (
+                PenaltySeverity::Low,
+                vec!["Low standard deviation in prioritization fee".to_string()],
+            ),
+            _ => (
+                PenaltySeverity::None,
+                vec!["Very low standard deviation in prioritization fee".to_string()],
+            ),
+        };
+        std_deviation_reasoning.push(format!(
+            "Prioritization fee standard deviation: {:?}",
+            pfm.std_deviation
+        ));
+
+        (
+            ReputationPenalty {
+                severity: avg_fee_severity,
+                reasoning: avg_fee_reasoning,
+            },
+            ReputationPenalty {
+                severity: std_deviation_severity,
+                reasoning: std_deviation_reasoning,
+            },
+        )
+    }
+}
