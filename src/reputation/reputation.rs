@@ -105,19 +105,6 @@ impl TransactionFailureRate {
     }
 }
 
-#[derive(Serialize)]
-pub enum RatingClassification {
-    AAA,
-    AA,
-    A,
-    BBB,
-    BB,
-    B,
-    CCC,
-    CC,
-    C,
-}
-
 impl From<i32> for RatingClassification {
     fn from(rating_score: i32) -> Self {
         match rating_score {
