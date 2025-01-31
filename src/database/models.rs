@@ -1,9 +1,12 @@
 use chrono::NaiveDateTime;
 use diesel::prelude::{Insertable, Queryable};
+use diesel::sql_types::SqlType;
 use diesel_derive_enum::DbEnum;
 use uuid::Uuid;
+use diesel::expression::AsExpression;
 
-#[derive(DbEnum, Debug, PartialEq)]
+#[derive(Debug, AsExpression, DbEnum)]
+#[diesel(sql_type = crate::database::schema::sql_types::RatingClassification)]
 pub enum RatingClassification {
     AAA,
     AA,
@@ -16,7 +19,7 @@ pub enum RatingClassification {
     C,
 }
 
-#[derive(Insertable, Queryable, Debug, PartialEq)]
+#[derive(Insertable, Queryable, Debug)]
 #[diesel(table_name = crate::database::schema::wallet_report)]
 #[diesel(check_for_backend(diesel::pg::Pg))]struct WalletReport {
     id: Uuid,
