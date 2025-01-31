@@ -3,7 +3,10 @@ use chrono::{DateTime, Utc};
 use serde::Serialize;
 
 use crate::{
-    database::models::RatingClassification, openai_client::{openai_client::OpenAIClient, types::GeneratedCaseReportSections}, reputation::reputation::Reputation, wallet::wallet::Wallet
+    database::models::RatingClassification,
+    openai_client::{openai_client::OpenAIClient, types::GeneratedCaseReportSections},
+    reputation::reputation::Reputation,
+    wallet::wallet::Wallet,
 };
 
 #[derive(Serialize)]

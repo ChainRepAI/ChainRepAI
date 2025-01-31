@@ -1,10 +1,10 @@
 use chrono::NaiveDateTime;
+use diesel::expression::AsExpression;
 use diesel::prelude::{Insertable, Queryable};
 use diesel::sql_types::SqlType;
 use diesel_derive_enum::DbEnum;
 use serde::Serialize;
 use uuid::Uuid;
-use diesel::expression::AsExpression;
 
 #[derive(Debug, AsExpression, DbEnum, Serialize)]
 #[diesel(sql_type = crate::database::schema::sql_types::RatingClassification)]
@@ -38,7 +38,8 @@ impl From<i32> for RatingClassification {
 
 #[derive(Insertable, Queryable, Debug)]
 #[diesel(table_name = crate::database::schema::wallet_report)]
-#[diesel(check_for_backend(diesel::pg::Pg))]struct WalletReport {
+#[diesel(check_for_backend(diesel::pg::Pg))]
+struct WalletReport {
     id: Uuid,
     rating_classification: RatingClassification,
     rating_score: i32,
