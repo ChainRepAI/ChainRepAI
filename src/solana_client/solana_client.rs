@@ -1,7 +1,7 @@
 use solana_client::{
     client_error::ClientError,
     nonblocking::rpc_client::RpcClient,
-    rpc_response::{RpcConfirmedTransactionStatusWithSignature, RpcKeyedAccount},
+    rpc_response::{RpcConfirmedTransactionStatusWithSignature, RpcKeyedAccount, RpcPrioritizationFee},
 };
 use solana_sdk::{account::Account, pubkey::Pubkey, signature::Signature};
 use solana_transaction_status::{EncodedConfirmedTransactionWithStatusMeta, UiTransactionEncoding};
@@ -54,5 +54,14 @@ impl SolanaClient {
         self.client
             .get_transaction(&signature, UiTransactionEncoding::Json)
             .await
+    }
+
+    pub async fn get_recent_prioritization_fees(
+        &self,
+        pub_key: &Pubkey,
+    ) -> Result<Vec<RpcPrioritizationFee>, ClientError> {
+        self.client.get_recent_prioritization_fees(
+            &[*pub_key]
+        ).await
     }
 }
