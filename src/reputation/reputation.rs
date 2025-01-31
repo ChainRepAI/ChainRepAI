@@ -120,15 +120,14 @@ impl Reputation {
         let (fee_penalty_1, fee_penalty_2) = PrioritizationFeesMetrics::calculate(&wallet).into();
         penalties.extend([fee_penalty_1, fee_penalty_2]);
 
-        let mut rating_score = 1000;
-        for penalty in &penalties {
-            rating_score -= match penalty.severity {
+        let rating_score = penalties.iter().fold(1000, |score, penalty| {
+            score - match penalty.severity {
                 PenaltySeverity::High => 250,
                 PenaltySeverity::Medium => 150,
                 PenaltySeverity::Low => 50,
                 PenaltySeverity::None => 0,
-            };
-        }
+            }
+        });
 
         Self {
             penalties,
