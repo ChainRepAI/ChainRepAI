@@ -8,6 +8,24 @@ pub struct WalletBalance(u64);
 
 pub struct TxPerHour(i64);
 
+impl TxPerHour {
+    /// Calculates transaction volume over last 1000 transactions
+    pub fn calculate(wallet: &Wallet) -> Self {
+        let transaction_history = &wallet.transaction_history;
+        let num_hours = transaction_history
+            .first()
+            .and_then(|first_tx| first_tx.block_time)
+            .zip(
+                transaction_history
+                    .last()
+                    .and_then(|last_tx| last_tx.block_time),
+            )
+            .map(|(first_tx_time, last_tx_time)| (first_tx_time - last_tx_time).abs() / 3600)
+            .unwrap_or(0);
+        Self(transaction_history.len() as i64 / num_hours)
+    }
+}
+
 pub struct DaysSinceLastBlock(u64);
 
 pub struct PrioritizationFeesMetrics {
@@ -109,7 +127,7 @@ impl Reputation {
     pub fn new_from_wallet(wallet: &Wallet) -> Self {
         let mut penalties: Vec<ReputationPenalty> = vec![];
         // add penalties
-        penalties.push(Reputation::transaction_volume(wallet).into());
+        penalties.push(TxPerHour::calculate(&wallet).into());
         penalties.push(WalletBalance(wallet.account_balance).into());
         penalties.push(
             Reputation::dormancy(wallet)
@@ -134,22 +152,6 @@ impl Reputation {
             rating_score,
             rating_classification: rating_score.into(),
         }
-    }
-
-    /// Calculates transaction volume over last 1000 transactions
-    pub fn transaction_volume(wallet: &Wallet) -> TxPerHour {
-        let transaction_history = &wallet.transaction_history;
-        let num_hours = transaction_history
-            .first()
-            .and_then(|first_tx| first_tx.block_time)
-            .zip(
-                transaction_history
-                    .last()
-                    .and_then(|last_tx| last_tx.block_time),
-            )
-            .map(|(first_tx_time, last_tx_time)| (first_tx_time - last_tx_time).abs() / 3600)
-            .unwrap_or(0);
-        TxPerHour(transaction_history.len() as i64 / num_hours)
     }
 
     pub fn dormancy(wallet: &Wallet) -> Option<DaysSinceLastBlock> {
