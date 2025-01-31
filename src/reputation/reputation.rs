@@ -28,6 +28,24 @@ impl TxPerHour {
 
 pub struct DaysSinceLastBlock(u64);
 
+impl DaysSinceLastBlock {
+    pub fn calculate(wallet: &Wallet) -> Option<Self> {
+        wallet
+            .transaction_history
+            .last()
+            .and_then(|last_tx| last_tx.block_time)
+            .map(|block_time| {
+                let current_time = SystemTime::now()
+                    .duration_since(UNIX_EPOCH)
+                    .expect("Time went backwards")
+                    .as_secs();
+
+                let time_diff = current_time.saturating_sub(block_time as u64);
+                Self(time_diff / (60 * 60 * 24))
+            })
+    }
+}
+
 pub struct PrioritizationFeesMetrics {
     avg_fee: f64,
     std_deviation: f64,
@@ -130,7 +148,7 @@ impl Reputation {
         penalties.push(TxPerHour::calculate(&wallet).into());
         penalties.push(WalletBalance(wallet.account_balance).into());
         penalties.push(
-            Reputation::dormancy(wallet)
+            DaysSinceLastBlock::calculate(&wallet)
                 .unwrap_or_else(|| DaysSinceLastBlock(std::u64::MAX))
                 .into(),
         );
@@ -139,12 +157,13 @@ impl Reputation {
         penalties.extend([fee_penalty_1, fee_penalty_2]);
 
         let rating_score = penalties.iter().fold(1000, |score, penalty| {
-            score - match penalty.severity {
-                PenaltySeverity::High => 250,
-                PenaltySeverity::Medium => 150,
-                PenaltySeverity::Low => 50,
-                PenaltySeverity::None => 0,
-            }
+            score
+                - match penalty.severity {
+                    PenaltySeverity::High => 250,
+                    PenaltySeverity::Medium => 150,
+                    PenaltySeverity::Low => 50,
+                    PenaltySeverity::None => 0,
+                }
         });
 
         Self {
@@ -152,22 +171,6 @@ impl Reputation {
             rating_score,
             rating_classification: rating_score.into(),
         }
-    }
-
-    pub fn dormancy(wallet: &Wallet) -> Option<DaysSinceLastBlock> {
-        wallet
-            .transaction_history
-            .last()
-            .and_then(|last_tx| last_tx.block_time)
-            .map(|block_time| {
-                let current_time = SystemTime::now()
-                    .duration_since(UNIX_EPOCH)
-                    .expect("Time went backwards")
-                    .as_secs();
-
-                let time_diff = current_time.saturating_sub(block_time as u64);
-                DaysSinceLastBlock(time_diff / (60 * 60 * 24))
-            })
     }
 }
 
