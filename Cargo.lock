@@ -29,6 +29,7 @@ dependencies = [
  "solana-sdk",
  "solana-transaction-status",
  "tokio",
+ "uuid",
 ]
 
 [[package]]
