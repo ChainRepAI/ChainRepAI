@@ -1,4 +1,6 @@
-use solana_client::rpc_response::{RpcConfirmedTransactionStatusWithSignature, RpcKeyedAccount, RpcPrioritizationFee};
+use solana_client::rpc_response::{
+    RpcConfirmedTransactionStatusWithSignature, RpcKeyedAccount, RpcPrioritizationFee,
+};
 use solana_sdk::{account::Account, pubkey::Pubkey};
 
 use crate::solana_client::solana_client::SolanaClient;
@@ -16,7 +18,13 @@ impl Wallet {
     pub async fn new(wallet_addr: &str, solana_client: &SolanaClient) -> Self {
         let pub_key = Pubkey::from_str_const(wallet_addr);
 
-        let (account_balance, account_info, transaction_history, token_accounts, prioritization_fees) = tokio::join!(
+        let (
+            account_balance,
+            account_info,
+            transaction_history,
+            token_accounts,
+            prioritization_fees,
+        ) = tokio::join!(
             solana_client.get_account_balance(&pub_key),
             solana_client.get_account_info(&pub_key),
             solana_client.get_transaction_history(&pub_key),
