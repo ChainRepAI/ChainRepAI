@@ -10,6 +10,38 @@ pub struct TxPerHour(i64);
 
 pub struct DaysSinceLastBlock(u64);
 
+pub struct PrioritizationFeesMetrics {
+    avg_fee: f64,
+    std_deviation: f64,
+}
+
+impl PrioritizationFeesMetrics {
+    pub fn calculate(wallet: &Wallet) -> Self {
+        let fees: Vec<f64> = wallet
+            .prioritization_fees
+            .iter()
+            .map(|fee| fee.prioritization_fee as f64)
+            .collect();
+        let avg_fee = fees.iter().sum::<f64>() / fees.len() as f64;
+
+        let variance = fees
+            .iter()
+            .map(|fee| {
+                let diff = fee - avg_fee;
+                diff * diff
+            })
+            .sum::<f64>()
+            / fees.len() as f64;
+
+        let std_deviation = variance.sqrt();
+
+        Self {
+            avg_fee,
+            std_deviation,
+        }
+    }
+}
+
 pub struct TransactionFailureRate(f64);
 
 impl TransactionFailureRate {
