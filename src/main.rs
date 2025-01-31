@@ -1,6 +1,6 @@
 use actix_web::{get, web, App, HttpResponse, HttpServer, Responder};
 use dotenv::dotenv;
-use ChainRepAI::{
+use SolAnalystAI::{
     case_report::case_report::CaseReport, openai_client::openai_client::OpenAIClient,
     reputation::reputation::Reputation, solana_client::solana_client::SolanaClient,
     wallet::wallet::Wallet,
