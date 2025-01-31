@@ -117,6 +117,8 @@ impl Reputation {
                 .into(),
         );
         penalties.push(TransactionFailureRate::calculate(&wallet).into());
+        let (fee_penalty_1, fee_penalty_2) = PrioritizationFeesMetrics::calculate(&wallet).into();
+        penalties.extend([fee_penalty_1, fee_penalty_2]);
 
         let mut rating_score = 1000;
         for penalty in &penalties {
