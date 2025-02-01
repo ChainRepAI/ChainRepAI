@@ -8,6 +8,8 @@ SolAnalystAI is your personal on-chain Solana wallet analyst. Using various indi
 This project is, and always will be, Open-Source and 100% free to use.
 
 ### Socials
+[Website](https://solanalystai.com/)
+<br>
 [Twitter](https://x.com/SolAnalystAI)
 <br>
 [YouTube](https://www.youtube.com/@SolAnalystAI)
