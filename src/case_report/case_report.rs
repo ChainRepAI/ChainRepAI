@@ -1,9 +1,7 @@
 use anyhow::Result;
-use chrono::{DateTime, Utc};
 use serde::Serialize;
 
 use crate::{
-    database::models::RatingClassification,
     openai_client::{openai_client::OpenAIClient, types::GeneratedCaseReportSections},
     reputation::reputation::Reputation,
     wallet::wallet::Wallet,
@@ -12,10 +10,7 @@ use crate::{
 #[derive(Serialize)]
 pub struct CaseReport {
     title: String,
-    rating_classification: RatingClassification,
-    rating_score: i32,
     sections: GeneratedCaseReportSections,
-    report_creation_date: DateTime<Utc>,
 }
 
 impl CaseReport {
@@ -30,12 +25,6 @@ impl CaseReport {
         );
         let sections = openai_client.generate_case_report(&reputation).await?;
 
-        Ok(CaseReport {
-            title,
-            rating_classification: reputation.rating_classification.clone(),
-            rating_score: reputation.rating_score,
-            sections,
-            report_creation_date: Utc::now(),
-        })
+        Ok(CaseReport { title, sections })
     }
 }
