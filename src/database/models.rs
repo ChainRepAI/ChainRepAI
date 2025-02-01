@@ -86,7 +86,7 @@ pub struct WalletReport {
     pub rating_classification: RatingClassification,
     pub rating_score: i32,
     pub case_report: serde_json::Value,
-    report_creation_date: NaiveDateTime,
+    pub report_creation_date: NaiveDateTime,
 }
 
 impl WalletReport {

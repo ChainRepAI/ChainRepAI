@@ -1,4 +1,5 @@
 use anyhow::Result;
+use chrono::NaiveDateTime;
 use diesel::{
     dsl::insert_into,
     query_dsl::methods::{FilterDsl, SelectDsl},
@@ -66,5 +67,16 @@ impl Database {
             .first::<WalletReport>(&mut self.conn)?
             .case_report;
         Ok(from_value(case_report)?)
+    }
+
+    pub fn get_wallet_report_creation_date(
+        &mut self,
+        wallet_report_id: Uuid,
+    ) -> Result<NaiveDateTime> {
+        Ok(wallet_report::table
+            .filter(wallet_report::id.eq(wallet_report_id))
+            .select(wallet_report::all_columns)
+            .first::<WalletReport>(&mut self.conn)?
+            .report_creation_date)
     }
 }
