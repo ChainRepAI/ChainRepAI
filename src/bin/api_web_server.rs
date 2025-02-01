@@ -13,11 +13,6 @@ use SolAnalystAI::{
     worker::worker::WALLET_REPUTATION_TOPIC,
 };
 
-#[get("/health")]
-async fn health_check() -> impl Responder {
-    HttpResponse::Ok()
-}
-
 fn get_wallet_report_case_report(report_id: Uuid) -> Result<CaseReport> {
     let mut database = Database::connect()?;
     Ok(database.get_wallet_report_case_report(report_id)?)
@@ -68,6 +63,11 @@ async fn get_wallet_report_endpoint(report_id: web::Path<Uuid>) -> impl Responde
         Ok(wallet_report) => HttpResponse::Ok().json(wallet_report),
         Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
     }
+}
+
+#[get("/health")]
+async fn health_check() -> impl Responder {
+    HttpResponse::Ok()
 }
 
 #[post("/start_wallet_report/{wallet_addr}")]
