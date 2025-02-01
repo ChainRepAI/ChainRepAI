@@ -78,7 +78,7 @@ impl From<i32> for RatingClassification {
     }
 }
 
-#[derive(Insertable, Queryable, Debug)]
+#[derive(Insertable, Queryable, Debug, Serialize)]
 #[diesel(table_name = crate::database::schema::wallet_report)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct WalletReport {

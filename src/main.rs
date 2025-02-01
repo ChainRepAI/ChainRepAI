@@ -1,11 +1,12 @@
 use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use anyhow::Result;
 use dotenv::dotenv;
 use uuid::Uuid;
 use SolAnalystAI::{
-    case_report::case_report::CaseReport, jobs::jobs::WalletReportJob,
-    openai_client::openai_client::OpenAIClient, pulsar::pulsar::PulsarClient,
-    reputation::reputation::Reputation, solana_client::solana_client::SolanaClient,
-    wallet::wallet::Wallet, worker::worker::WALLET_REPUTATION_TOPIC,
+    database::{models::WalletReport, postgres::Database},
+    jobs::jobs::WalletReportJob,
+    pulsar::pulsar::PulsarClient,
+    worker::worker::WALLET_REPUTATION_TOPIC,
 };
 
 #[get("/health")]
@@ -13,22 +14,22 @@ async fn health_check() -> impl Responder {
     HttpResponse::Ok()
 }
 
-#[get("/wallet_report/{wallet_addr}")]
-async fn wallet_report(wallet_addr: web::Path<String>) -> impl Responder {
-    dotenv().ok();
-    let solana_client = SolanaClient::new();
-    let wallet = Wallet::new(wallet_addr.as_str(), &solana_client).await;
-    let reputation = Reputation::new_from_wallet(&wallet);
-    let openai_client = OpenAIClient::new();
+fn get_wallet_report(report_id: Uuid) -> Result<WalletReport> {
+    let mut database = Database::connect()?;
+    Ok(database.get_wallet_report(report_id)?)
+}
 
-    match CaseReport::new(&openai_client, reputation, wallet).await {
-        Ok(case_report) => HttpResponse::Ok().json(case_report),
+#[get("/get_wallet_report/{report_id}")]
+async fn get_wallet_report_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
+    dotenv().ok();
+    match get_wallet_report(*report_id) {
+        Ok(wallet_report) => HttpResponse::Ok().json(wallet_report),
         Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
     }
 }
 
 #[post("/start_wallet_report/{wallet_addr}")]
-async fn start_wallet_report(wallet_addr: web::Path<String>) -> impl Responder {
+async fn start_wallet_report_endpoint(wallet_addr: web::Path<String>) -> impl Responder {
     dotenv().ok();
 
     let pulsar_client = PulsarClient::new().await;
@@ -50,8 +51,8 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(|| {
         App::new()
             .service(health_check)
-            .service(wallet_report)
-            .service(start_wallet_report)
+            .service(get_wallet_report_endpoint)
+            .service(start_wallet_report_endpoint)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
