@@ -10,7 +10,7 @@ This project is, and always will be, Open-Source and 100% free to use.
 ### Socials
 [Twitter](https://x.com/SolAnalystAI)
 <br>
-[YouTube]()
+[YouTube](https://www.youtube.com/@SolAnalystAI)
 
 ## Breakdown of the Reputational Indicators
 
