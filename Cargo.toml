@@ -16,6 +16,6 @@ solana-sdk = "2.1.11"
 solana-transaction-status = "2.1.11"
 tokio = "1.43.0"
 diesel = { version = "2.2.5", features = ["postgres", "uuid", "chrono", "serde_json"] }
-uuid = "1.12.1"
+uuid = { version = "1.11.0", features = ["serde", "v4", "fast-rng"] }
 pulsar = "6.3.0"
 futures = "0.3.31"
