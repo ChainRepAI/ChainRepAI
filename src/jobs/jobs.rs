@@ -1,6 +1,7 @@
 use anyhow::Result;
 use pulsar::{producer, DeserializeMessage, Error as PulsarError, SerializeMessage};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
 use crate::{
     case_report::case_report::CaseReport, database::models::WalletReport,
@@ -9,6 +10,7 @@ use crate::{
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct WalletReportJob {
+    report_id: Uuid,
     wallet_addr: String,
 }
 
@@ -36,6 +38,7 @@ impl WalletReportJob {
         let reputation = Reputation::new_from_wallet(&wallet);
         let case_report = CaseReport::new(&worker.openai_client, &reputation, wallet).await?;
         let wallet_report = WalletReport::new(
+            self.report_id,
             reputation.rating_classification,
             reputation.rating_score,
             case_report,

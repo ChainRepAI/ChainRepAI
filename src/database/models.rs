@@ -91,12 +91,13 @@ pub struct WalletReport {
 
 impl WalletReport {
     pub fn new(
+        id: Uuid,
         rating_classification: RatingClassification,
         rating_score: i32,
         case_report: CaseReport,
     ) -> Result<Self> {
         Ok(Self {
-            id: Uuid::new_v4(),
+            id,
             rating_classification,
             rating_score,
             case_report: serde_json::to_value(case_report)?,
