@@ -1,6 +1,7 @@
 use std::io::Write;
 
-use chrono::NaiveDateTime;
+use anyhow::Result;
+use chrono::{NaiveDateTime, Utc};
 use diesel::deserialize::{self, FromSql, FromSqlRow};
 use diesel::expression::AsExpression;
 use diesel::pg::{Pg, PgValue};
@@ -8,6 +9,8 @@ use diesel::prelude::{Insertable, Queryable};
 use diesel::serialize::{self, IsNull, Output, ToSql};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+
+use crate::case_report::case_report::CaseReport;
 
 #[derive(Debug, AsExpression, FromSqlRow, Serialize, Deserialize, PartialEq, Clone)]
 #[diesel(sql_type = crate::database::schema::sql_types::RatingClassification)]
@@ -84,4 +87,20 @@ pub struct WalletReport {
     rating_score: i32,
     case_report: serde_json::Value,
     report_creation_date: NaiveDateTime,
+}
+
+impl WalletReport {
+    pub fn new(
+        rating_classification: RatingClassification,
+        rating_score: i32,
+        case_report: CaseReport,
+    ) -> Result<Self> {
+        Ok(Self {
+            id: Uuid::new_v4(),
+            rating_classification,
+            rating_score,
+            case_report: serde_json::to_value(case_report)?,
+            report_creation_date: Utc::now().naive_local(),
+        })
+    }
 }
