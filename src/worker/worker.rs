@@ -6,3 +6,12 @@ pub struct WalletReportWorker {
     openai_client: OpenAIClient,
 }
 
+impl WalletReportWorker {
+    pub fn new() -> Self {
+        Self {
+            database: Database::connect().expect("Should be able to connect to db"),
+            solana_client: SolanaClient::new(),
+            openai_client: OpenAIClient::new(),
+        }
+    }
+}
