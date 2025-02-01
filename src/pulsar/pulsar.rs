@@ -1,4 +1,5 @@
-use pulsar::{Pulsar, TokioExecutor};
+use pulsar::{Producer, Pulsar, TokioExecutor};
+use uuid::Uuid;
 
 const PULSAR_ADDR: &str = "pulsar://localhost:6650";
 
@@ -15,4 +16,9 @@ impl PulsarClient {
                 .expect("Should be able to create new pulsar client builder"),
         }
     }
+}
+
+pub struct PulsarProducer {
+    id: Uuid,
+    internal_producer: Producer<TokioExecutor>,
 }
