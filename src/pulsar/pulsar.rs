@@ -1,5 +1,7 @@
-use pulsar::{producer, proto, Producer, Pulsar, TokioExecutor};
+use pulsar::{producer, proto, Consumer, Producer, Pulsar, TokioExecutor};
 use uuid::Uuid;
+
+use crate::jobs::jobs::WalletReportJob;
 
 const PULSAR_ADDR: &str = "pulsar://localhost:6650";
 
@@ -45,4 +47,9 @@ impl PulsarClient {
 pub struct PulsarProducer {
     id: Uuid,
     internal_producer: Producer<TokioExecutor>,
+}
+
+pub struct PulsarConsumer {
+    id: Uuid,
+    pub internal_consumer: Consumer<WalletReportJob, TokioExecutor>,
 }
