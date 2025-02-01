@@ -4,7 +4,10 @@ use diesel::{
     query_dsl::methods::{FilterDsl, SelectDsl},
     Connection, ExpressionMethods, PgConnection, RunQueryDsl,
 };
+use serde_json::from_value;
 use uuid::Uuid;
+
+use crate::case_report::case_report::CaseReport;
 
 use super::{
     models::{RatingClassification, WalletReport},
@@ -54,5 +57,14 @@ impl Database {
             .select(wallet_report::all_columns)
             .first::<WalletReport>(&mut self.conn)?
             .rating_score)
+    }
+
+    pub fn get_wallet_report_case_report(&mut self, wallet_report_id: Uuid) -> Result<CaseReport> {
+        let case_report = wallet_report::table
+            .filter(wallet_report::id.eq(wallet_report_id))
+            .select(wallet_report::all_columns)
+            .first::<WalletReport>(&mut self.conn)?
+            .case_report;
+        Ok(from_value(case_report)?)
     }
 }

@@ -85,7 +85,7 @@ pub struct WalletReport {
     id: Uuid,
     pub rating_classification: RatingClassification,
     pub rating_score: i32,
-    case_report: serde_json::Value,
+    pub case_report: serde_json::Value,
     report_creation_date: NaiveDateTime,
 }
 

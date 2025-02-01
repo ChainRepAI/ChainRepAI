@@ -1,5 +1,5 @@
 use anyhow::Result;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::{
     openai_client::{openai_client::OpenAIClient, types::GeneratedCaseReportSections},
@@ -7,7 +7,7 @@ use crate::{
     wallet::wallet::Wallet,
 };
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct CaseReport {
     title: String,
     sections: GeneratedCaseReportSections,
