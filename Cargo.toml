@@ -16,5 +16,4 @@ solana-sdk = "2.1.11"
 solana-transaction-status = "2.1.11"
 tokio = "1.43.0"
 diesel = { version = "2.2.5", features = ["postgres", "uuid", "chrono", "serde_json"] }
-diesel-derive-enum = "2.1.0"
 uuid = "1.12.1"
