@@ -1,12 +1,10 @@
 use chrono::NaiveDateTime;
 use diesel::expression::AsExpression;
 use diesel::prelude::{Insertable, Queryable};
-use diesel::sql_types::SqlType;
-use diesel_derive_enum::DbEnum;
 use serde::Serialize;
 use uuid::Uuid;
 
-#[derive(Debug, AsExpression, DbEnum, Serialize)]
+#[derive(Debug, AsExpression, Serialize)]
 #[diesel(sql_type = crate::database::schema::sql_types::RatingClassification)]
 pub enum RatingClassification {
     AAA,
