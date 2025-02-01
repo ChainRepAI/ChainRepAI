@@ -3,6 +3,7 @@ use anyhow::Result;
 use dotenv::dotenv;
 use uuid::Uuid;
 use SolAnalystAI::{
+    case_report::case_report::CaseReport,
     database::{
         models::{RatingClassification, WalletReport},
         postgres::Database,
@@ -15,6 +16,11 @@ use SolAnalystAI::{
 #[get("/health")]
 async fn health_check() -> impl Responder {
     HttpResponse::Ok()
+}
+
+fn get_wallet_report_case_report(report_id: Uuid) -> Result<CaseReport> {
+    let mut database = Database::connect()?;
+    Ok(database.get_wallet_report_case_report(report_id)?)
 }
 
 fn get_wallet_report_score(report_id: Uuid) -> Result<i32> {
@@ -30,6 +36,14 @@ fn get_wallet_report_classification(report_id: Uuid) -> Result<RatingClassificat
 fn get_wallet_report(report_id: Uuid) -> Result<WalletReport> {
     let mut database = Database::connect()?;
     Ok(database.get_wallet_report(report_id)?)
+}
+
+#[get("/get_wallet_report_case_report/{report_id}")]
+async fn get_wallet_report_case_report_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
+    match get_wallet_report_case_report(*report_id) {
+        Ok(case_report) => HttpResponse::Ok().json(case_report),
+        Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
+    }
 }
 
 #[get("/get_wallet_report_score/{report_id}")]
@@ -82,6 +96,7 @@ async fn main() -> std::io::Result<()> {
             .service(start_wallet_report_endpoint)
             .service(get_wallet_report_classification_endpoint)
             .service(get_wallet_report_score_endpoint)
+            .service(get_wallet_report_case_report_endpoint)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
