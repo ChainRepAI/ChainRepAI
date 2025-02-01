@@ -5,3 +5,4 @@ pub mod pulsar;
 pub mod reputation;
 pub mod solana_client;
 pub mod wallet;
+pub mod jobs;
