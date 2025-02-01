@@ -10,8 +10,8 @@ use crate::{
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct WalletReportJob {
-    report_id: Uuid,
-    wallet_addr: String,
+    pub report_id: Uuid,
+    pub wallet_addr: String,
 }
 
 impl SerializeMessage for WalletReportJob {
