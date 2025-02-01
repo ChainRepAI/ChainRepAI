@@ -1,5 +1,10 @@
 use anyhow::Result;
-use diesel::{dsl::insert_into, Connection, PgConnection, RunQueryDsl};
+use diesel::{
+    dsl::insert_into,
+    query_dsl::methods::{FilterDsl, SelectDsl},
+    Connection, ExpressionMethods, PgConnection, RunQueryDsl,
+};
+use uuid::Uuid;
 
 use super::{models::WalletReport, schema::wallet_report};
 
@@ -15,11 +20,17 @@ impl Database {
     }
 
     pub fn insert_wallet_report(&mut self, wallet_report: WalletReport) -> Result<()> {
-
         insert_into(wallet_report::table)
             .values(wallet_report)
             .execute(&mut self.conn)?;
 
         Ok(())
+    }
+
+    pub fn get_wallet_report(&mut self, wallet_report_id: Uuid) -> Result<WalletReport> {
+        Ok(wallet_report::table
+            .filter(wallet_report::id.eq(wallet_report_id))
+            .select(wallet_report::all_columns)
+            .first::<WalletReport>(&mut self.conn)?)
     }
 }

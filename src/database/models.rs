@@ -1,15 +1,15 @@
 use std::io::Write;
 
 use chrono::NaiveDateTime;
-use diesel::deserialize::{self, FromSql};
+use diesel::deserialize::{self, FromSql, FromSqlRow};
 use diesel::expression::AsExpression;
 use diesel::pg::{Pg, PgValue};
 use diesel::prelude::{Insertable, Queryable};
 use diesel::serialize::{self, IsNull, Output, ToSql};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Debug, AsExpression, Serialize)]
+#[derive(Debug, AsExpression, FromSqlRow, Serialize, Deserialize, PartialEq, Clone)]
 #[diesel(sql_type = crate::database::schema::sql_types::RatingClassification)]
 pub enum RatingClassification {
     AAA,
