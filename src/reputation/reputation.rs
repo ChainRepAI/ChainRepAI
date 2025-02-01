@@ -105,7 +105,7 @@ impl TransactionFailureRate {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct Reputation {
     pub penalties: Vec<ReputationPenalty>,
     pub rating_score: i32,
@@ -145,7 +145,7 @@ impl Reputation {
     }
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone, Copy)]
 pub enum PenaltySeverity {
     High,
     Medium,
@@ -153,7 +153,7 @@ pub enum PenaltySeverity {
     None,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Clone)]
 pub struct ReputationPenalty {
     severity: PenaltySeverity,
     reasoning: Vec<String>,

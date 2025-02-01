@@ -21,7 +21,7 @@ pub struct CaseReport {
 impl CaseReport {
     pub async fn new(
         openai_client: &OpenAIClient,
-        reputation: Reputation,
+        reputation: &Reputation,
         wallet: Wallet,
     ) -> Result<Self> {
         let title = format!(
@@ -32,7 +32,7 @@ impl CaseReport {
 
         Ok(CaseReport {
             title,
-            rating_classification: reputation.rating_classification,
+            rating_classification: reputation.rating_classification.clone(),
             rating_score: reputation.rating_score,
             sections,
             report_creation_date: Utc::now(),
