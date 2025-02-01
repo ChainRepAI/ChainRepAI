@@ -33,6 +33,9 @@ High transaction failure rate may imply lower wallet reputation in several ways:
 - Attempts to front-run or engage in high-frequency activities without proper optimization
 - Interaction with poorly written smart contracts
 
+### Prioritization Fee Metrics
+Two metrics form this indicator: average fee and fee standard deviation. Lower standard deviation implies higher wallet reputation as it reflects higher stability towards transaction management and a consistent strategy. Higher average prioritization fees also imply higher wallet reputation as it can imply the wallet is more confident in their transactions and take active approaches to mitigate front-running attempts.
+
 ## Example Generated Report: @frankdegods
 <img src="images/frank.png" width="300">
 
