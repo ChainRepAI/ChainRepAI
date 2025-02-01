@@ -1,9 +1,10 @@
-use pulsar::{consumer::Message, producer, proto, Consumer, Producer, Pulsar, TokioExecutor};
+use pulsar::{consumer::{DeadLetterPolicy, Message}, producer, proto, Consumer, Producer, Pulsar, SubType, TokioExecutor};
 use uuid::Uuid;
 
 use crate::jobs::jobs::WalletReportJob;
 
 const PULSAR_ADDR: &str = "pulsar://localhost:6650";
+const MAX_JOB_RETRY: usize = 3;
 
 pub struct PulsarClient {
     internal_client: Pulsar<TokioExecutor>,
@@ -40,6 +41,34 @@ impl PulsarClient {
                 .build()
                 .await
                 .expect("Should be able to create producer"),
+        }
+    }
+
+    pub async fn create_consumer(
+        &self,
+        topics: Vec<&str>,
+        subscription_type: SubType,
+        subscription: &str,
+    ) -> PulsarConsumer {
+        let id = Uuid::new_v4();
+        PulsarConsumer {
+            id,
+            internal_consumer: self
+                .internal_client
+                .consumer()
+                // .with_topic(topic)
+                .with_consumer_name("CONSUMER_".to_owned() + &id.to_string())
+                .with_subscription_type(subscription_type) // exclusive for current testing
+                // .with_subscription("SUB_".to_owned() + &id.to_string())
+                .with_subscription(subscription)
+                .with_topics(topics)
+                .with_dead_letter_policy(DeadLetterPolicy {
+                    max_redeliver_count: MAX_JOB_RETRY,
+                    dead_letter_topic: "DLQ".to_string(),
+                })
+                .build()
+                .await
+                .expect("Should be able to create consumer"),
         }
     }
 }
