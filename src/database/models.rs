@@ -78,7 +78,7 @@ impl From<i32> for RatingClassification {
 #[derive(Insertable, Queryable, Debug)]
 #[diesel(table_name = crate::database::schema::wallet_report)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-struct WalletReport {
+pub struct WalletReport {
     id: Uuid,
     rating_classification: RatingClassification,
     rating_score: i32,
