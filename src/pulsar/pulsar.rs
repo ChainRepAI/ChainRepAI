@@ -1,4 +1,7 @@
-use pulsar::{consumer::{DeadLetterPolicy, Message}, producer, proto, Consumer, Producer, Pulsar, SubType, TokioExecutor};
+use pulsar::{
+    consumer::{DeadLetterPolicy, Message},
+    producer, proto, Consumer, Producer, Pulsar, SubType, TokioExecutor,
+};
 use uuid::Uuid;
 
 use crate::jobs::jobs::WalletReportJob;
