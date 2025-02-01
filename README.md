@@ -61,8 +61,11 @@ The wallet recently engaged in activity less than a week ago, with the last tran
 The absence of severe penalties indicates the wallet operates within reasonable transaction volumes, which helps maintain a stable reputation. With an average of 14 transactions per hour, this wallet shows a consistent yet moderate level of activity, reducing risks of sudden or suspicious behavior that might trigger scrutiny. Additionally, the wallet's balance of 4173 Solana significantly exceeds the threshold of 100 Solana, further bolstering its credibility. Low transaction failure rates at 4.2% also suggest careful management of transactions, enhancing user confidence and minimizing exposure to risks associated with technical issues.
 
 ## How to run locally
-
-1. Create the .env file, will need to add the following variables:
+1. Clone down the project
+    ```console
+    git clone git@github.com:SolAnalystAI SolAnalystAI.git
+    ```
+2. Create a .env file and define the following environment variables:
     ```
     RPC_URL = "https://api.mainnet-beta.solana.com"
     OPENAI_API_KEY="<redacted>"
@@ -70,9 +73,9 @@ The absence of severe penalties indicates the wallet operates within reasonable 
     DATABASE_URL="postgres://localhost/db_name"
     ```
 
-2. Postgres running with database created (with name specified in .env)
-3. Pulsar running
-4. In separate terminals, run the following commands:
+3. Postgres running with the required database created (name specified in the .env file)
+4. Pulsar running
+5. In separate terminals, run the following commands to start the binaries:
     ```console
     cargo run --bin api_web_server
     cargo run --bin report_worker
