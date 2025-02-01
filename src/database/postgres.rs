@@ -47,4 +47,12 @@ impl Database {
             .first::<WalletReport>(&mut self.conn)?
             .rating_classification)
     }
+
+    pub fn get_wallet_report_score(&mut self, wallet_report_id: Uuid) -> Result<i32> {
+        Ok(wallet_report::table
+            .filter(wallet_report::id.eq(wallet_report_id))
+            .select(wallet_report::all_columns)
+            .first::<WalletReport>(&mut self.conn)?
+            .rating_score)
+    }
 }

@@ -84,7 +84,7 @@ impl From<i32> for RatingClassification {
 pub struct WalletReport {
     id: Uuid,
     pub rating_classification: RatingClassification,
-    rating_score: i32,
+    pub rating_score: i32,
     case_report: serde_json::Value,
     report_creation_date: NaiveDateTime,
 }
