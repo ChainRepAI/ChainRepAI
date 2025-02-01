@@ -1,3 +1,4 @@
+use anyhow::Result;
 use pulsar::{
     consumer::{DeadLetterPolicy, Message},
     producer, proto, Consumer, Producer, Pulsar, SubType, TokioExecutor,
@@ -79,6 +80,13 @@ impl PulsarClient {
 pub struct PulsarProducer {
     id: Uuid,
     internal_producer: Producer<TokioExecutor>,
+}
+
+impl PulsarProducer {
+    pub async fn enqueue_job(&mut self, event: WalletReportJob) -> Result<()> {
+        self.internal_producer.send_non_blocking(event).await?;
+        Ok(())
+    }
 }
 
 pub struct PulsarConsumer {
