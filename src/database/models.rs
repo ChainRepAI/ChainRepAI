@@ -83,7 +83,7 @@ impl From<i32> for RatingClassification {
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct WalletReport {
     id: Uuid,
-    rating_classification: RatingClassification,
+    pub rating_classification: RatingClassification,
     rating_score: i32,
     case_report: serde_json::Value,
     report_creation_date: NaiveDateTime,

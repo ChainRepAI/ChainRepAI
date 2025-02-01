@@ -6,7 +6,10 @@ use diesel::{
 };
 use uuid::Uuid;
 
-use super::{models::WalletReport, schema::wallet_report};
+use super::{
+    models::{RatingClassification, WalletReport},
+    schema::wallet_report,
+};
 
 pub struct Database {
     conn: PgConnection,
@@ -32,5 +35,16 @@ impl Database {
             .filter(wallet_report::id.eq(wallet_report_id))
             .select(wallet_report::all_columns)
             .first::<WalletReport>(&mut self.conn)?)
+    }
+
+    pub fn get_wallet_report_classification(
+        &mut self,
+        wallet_report_id: Uuid,
+    ) -> Result<RatingClassification> {
+        Ok(wallet_report::table
+            .filter(wallet_report::id.eq(wallet_report_id))
+            .select(wallet_report::all_columns)
+            .first::<WalletReport>(&mut self.conn)?
+            .rating_classification)
     }
 }
