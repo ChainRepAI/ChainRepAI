@@ -1,4 +1,4 @@
-use pulsar::{producer, proto, Consumer, Producer, Pulsar, TokioExecutor};
+use pulsar::{consumer::Message, producer, proto, Consumer, Producer, Pulsar, TokioExecutor};
 use uuid::Uuid;
 
 use crate::jobs::jobs::WalletReportJob;
@@ -52,4 +52,18 @@ pub struct PulsarProducer {
 pub struct PulsarConsumer {
     id: Uuid,
     pub internal_consumer: Consumer<WalletReportJob, TokioExecutor>,
+}
+
+impl PulsarConsumer {
+    pub async fn ack(&mut self, msg: &Message<WalletReportJob>) {
+        if let Err(_) = self.internal_consumer.ack(msg).await {
+            println!("Failed to ack message with id: {:?}", msg.message_id());
+        }
+    }
+
+    pub async fn nack(&mut self, msg: &Message<WalletReportJob>) {
+        if let Err(_) = self.internal_consumer.nack(msg).await {
+            println!("Failed to nack message with id: {:?}", msg.message_id());
+        }
+    }
 }
