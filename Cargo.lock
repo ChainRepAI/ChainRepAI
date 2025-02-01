@@ -21,6 +21,7 @@ dependencies = [
  "chrono",
  "diesel",
  "dotenv",
+ "futures",
  "pulsar",
  "reqwest 0.12.12",
  "serde",
