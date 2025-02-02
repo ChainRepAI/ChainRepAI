@@ -87,8 +87,8 @@ A high volume of transactions directed toward newly created Solana wallets can i
 
 On the other hand, transactions involving well-established wallets—those with a longer history of activity, a substantial Solana balance, and a pattern of consistent, reliable transactions—are generally viewed as more trustworthy. These wallets are often associated with experienced traders, institutional participants, or long-term investors, making them less likely to be involved in deceptive practices. As a result, they tend to inspire greater confidence within the ecosystem and are considered stronger indicators of authentic trading behavior.
 
-## Web API Routes
-| HTTP Method | Route                                      | Description                                                                 |
+## Web API Endpoints
+| HTTP Method | Endpoint                                   | Description                                                                 |
 |-------------|--------------------------------------------|-----------------------------------------------------------------------------|
 | POST        | `/start_wallet_report/{wallet_addr}`       | Start a wallet report on the supplied wallet address.                       |
 | GET         | `/get_wallet_report/{report_id}`           | Get the generated wallet report, specified by the `report_id` returned from the POST endpoint when the report started. |
