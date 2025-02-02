@@ -61,7 +61,9 @@ Regular activity over a long period of time indicates the wallet is legitimate a
 To receive no or a low penalty on this indicator, wallets should maintain a reasonable level of transaction volume over an extended period of time. 
 
 ### Dormancy
-Dormancy, or time since last transaction, is a considerable indicator into a wallet's reputation. Large periods of time since a transaction indicates the wallet is not frequently used.
+Dormancy, or the time elapsed since a wallet's last transaction, serves as a significant indicator of its reputation and activity level. A long period of inactivity suggests that the wallet is not frequently used, which may raise questions about its reliability or relevance within the network. Inactive wallets could belong to long-term holders, lost or abandoned accounts, or entities that engage in sporadic trading rather than active participation.
+
+Conversely, wallets that maintain regular transaction activity demonstrate ongoing engagement with the network, reinforcing their credibility and trustworthiness. Frequent and consistent usage suggests an actively managed account, reducing uncertainty about its purpose and reliability. As a result, dormancy can be a crucial factor in assessing a wallet’s overall reputation within the Solana ecosystem.
 
 ### Transaction failure rate
 High transaction failure rate may imply lower wallet reputation in several ways:
