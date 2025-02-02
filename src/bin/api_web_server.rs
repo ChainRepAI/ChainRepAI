@@ -6,13 +6,18 @@ use uuid::Uuid;
 use SolAnalystAI::{
     case_report::case_report::CaseReport,
     database::{
-        models::{RatingClassification, WalletReport},
+        models::{RatingClassification, WalletMetrics, WalletReport},
         postgres::Database,
     },
     jobs::jobs::WalletReportJob,
     pulsar::pulsar::PulsarClient,
     worker::worker::WALLET_REPUTATION_TOPIC,
 };
+
+fn get_wallet_report_metrics(report_id: Uuid) -> Result<WalletMetrics> {
+    let mut database = Database::connect()?;
+    Ok(database.get_wallet_metrics(report_id)?)
+}
 
 fn get_wallet_report_count(wallet_addr: String) -> Result<i64> {
     let mut database = Database::connect()?;
@@ -42,6 +47,14 @@ fn get_wallet_report_classification(report_id: Uuid) -> Result<RatingClassificat
 fn get_wallet_report(report_id: Uuid) -> Result<WalletReport> {
     let mut database = Database::connect()?;
     Ok(database.get_wallet_report(report_id)?)
+}
+
+#[get("/get_wallet_report_metrics/{report_id}")]
+async fn get_wallet_report_metrics_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
+    match get_wallet_report_metrics(*report_id) {
+        Ok(wallet_metrics) => HttpResponse::Ok().json(wallet_metrics),
+        Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
+    }
 }
 
 #[get("/get_wallet_report_creation_count/{wallet_addr}")]
@@ -128,6 +141,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_wallet_report_case_report_endpoint)
             .service(get_wallet_report_creation_date_endpoint)
             .service(get_wallet_report_creation_count_endpoint)
+            .service(get_wallet_report_metrics_endpoint)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
