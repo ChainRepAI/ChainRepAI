@@ -16,5 +16,6 @@ diesel::table! {
         rating_score -> Int4,
         case_report -> Jsonb,
         report_creation_date -> Timestamp,
+        wallet_addr -> Text,
     }
 }
