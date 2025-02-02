@@ -108,3 +108,16 @@ impl WalletReport {
         })
     }
 }
+
+#[derive(Insertable, Queryable, Debug, Serialize, Clone)]
+#[diesel(table_name = crate::database::schema::wallet_metrics)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct WalletMetrics {
+    pub wallet_report_id: Uuid,
+    pub transaction_failure_rate: f64,
+    pub avg_prio_fee: f64,
+    pub prio_fee_std_devi: f64,
+    pub days_since_last_block: i64,
+    pub tx_per_hour: i64,
+    pub wallet_balance: i64,
+}
