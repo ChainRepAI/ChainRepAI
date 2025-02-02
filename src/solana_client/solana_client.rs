@@ -84,8 +84,8 @@ impl SolanaClient {
                 let sig_clone = sig_info.signature.clone();
                 // An async move block to ensure the signature's lifetime is properly contained.
                 async move {
-                    let signature = Signature::from_str(&sig_clone)
-                        .expect("Invalid signature format");
+                    let signature =
+                        Signature::from_str(&sig_clone).expect("Invalid signature format");
                     self.client
                         .get_transaction(&signature, UiTransactionEncoding::Json)
                         .await
@@ -109,7 +109,7 @@ impl SolanaClient {
 #[cfg(test)]
 mod tests {
     use crate::wallet::wallet::Wallet;
-    
+
     use super::*;
     use dotenv::dotenv;
 
@@ -120,6 +120,8 @@ mod tests {
         dotenv().ok();
         let solana_client = SolanaClient::new();
         let wallet = Wallet::new(TEST_WALLET_ADDR, &solana_client).await;
-        let _ = solana_client.batch_process_transactions(wallet.transaction_history).await;
+        let _ = solana_client
+            .batch_process_transactions(wallet.transaction_history)
+            .await;
     }
 }

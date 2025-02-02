@@ -18,7 +18,9 @@ impl WalletBalanceVolatility {
             .iter()
             .filter_map(|tx| {
                 // Check if metadata exists and contains at least one balance in post_balances.
-                tx.transaction.meta.as_ref()
+                tx.transaction
+                    .meta
+                    .as_ref()
                     .and_then(|meta| meta.post_balances.get(0))
                     .map(|balance| *balance as f64)
             })
@@ -405,10 +407,12 @@ impl From<WalletBalanceVolatility> for ReputationPenalty {
             balance_volatility.0
         ));
 
-        Self {severity, reasoning}
+        Self {
+            severity,
+            reasoning,
+        }
     }
 }
-
 
 #[cfg(test)]
 mod tests {
