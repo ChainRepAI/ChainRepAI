@@ -189,4 +189,17 @@ mod tests {
         // Expect Internal Server Error response because dependencies are not mocked
         assert_eq!(resp.status(), StatusCode::INTERNAL_SERVER_ERROR);
     }
+
+    #[actix_web::test]
+    async fn test_get_wallet_report_endpoint() {
+        // Initialize the app with the wallet report endpoint
+        let app = test::init_service(App::new().service(get_wallet_report_endpoint)).await;
+        let uuid = Uuid::new_v4();
+        let req = test::TestRequest::get()
+            .uri(&format!("/get_wallet_report/{}", uuid))
+            .to_request();
+        let resp = test::call_service(&app, req).await;
+        // Expect error response because the real database connection is not available
+        assert_eq!(resp.status(), StatusCode::INTERNAL_SERVER_ERROR);
+    }
 }
