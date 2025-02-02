@@ -7,6 +7,18 @@ pub mod sql_types {
 }
 
 diesel::table! {
+    wallet_metrics (wallet_report_id) {
+        wallet_report_id -> Uuid,
+        transaction_failure_rate -> Float8,
+        avg_prio_fee -> Float8,
+        prio_fee_std_devi -> Float8,
+        days_since_last_block -> Int8,
+        tx_per_hour -> Int8,
+        wallet_balance -> Int8,
+    }
+}
+
+diesel::table! {
     use diesel::sql_types::*;
     use super::sql_types::RatingClassification;
 
@@ -19,3 +31,5 @@ diesel::table! {
         wallet_addr -> Text,
     }
 }
+
+diesel::allow_tables_to_appear_in_same_query!(wallet_metrics, wallet_report,);
