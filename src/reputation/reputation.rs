@@ -326,3 +326,30 @@ impl From<PrioritizationFeesMetrics> for (ReputationPenalty, ReputationPenalty) 
         )
     }
 }
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use solana_client::rpc_response::RpcConfirmedTransactionStatusWithSignature;
+
+    #[test]
+    fn test_wallet_balance_penalties() {
+        let test_cases = vec![
+            (500_000_000, PenaltySeverity::High),     // 0.5 SOL
+            (5_000_000_000, PenaltySeverity::Medium), // 5 SOL
+            (50_000_000_000, PenaltySeverity::Low),   // 50 SOL
+            (150_000_000_000, PenaltySeverity::None), // 150 SOL
+        ];
+
+        for (balance, expected_severity) in test_cases {
+            let penalty: ReputationPenalty = WalletBalance(balance).into();
+            assert_eq!(
+                std::mem::discriminant(&penalty.severity),
+                std::mem::discriminant(&expected_severity),
+                "Balance {} should have {:?} severity",
+                balance,
+                expected_severity
+            );
+        }
+    }
+
+}
