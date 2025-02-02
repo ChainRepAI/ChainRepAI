@@ -396,4 +396,29 @@ mod tests {
             );
         }
     }
+
+    #[test]
+    fn test_days_since_last_block() {
+        let current_time = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs();
+
+        let test_cases = vec![
+            (current_time, PenaltySeverity::None),                // Today
+            (current_time - 3 * 86400, PenaltySeverity::Low),     // 3 days ago
+            (current_time - 15 * 86400, PenaltySeverity::Medium), // 15 days ago
+            (current_time - 35 * 86400, PenaltySeverity::High),   // 35 days ago
+        ];
+
+        for (block_time, expected_severity) in test_cases {
+            let transactions = vec![create_mock_transaction(Some(block_time as i64), false)];
+            let days = DaysSinceLastBlock::calculate(&transactions).unwrap();
+            let penalty: ReputationPenalty = days.into();
+            assert_eq!(
+                std::mem::discriminant(&penalty.severity),
+                std::mem::discriminant(&expected_severity),
+            );
+        }
+    }
 }
