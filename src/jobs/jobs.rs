@@ -42,6 +42,7 @@ impl WalletReportJob {
             reputation.rating_classification,
             reputation.rating_score,
             case_report,
+            self.wallet_addr.clone(),
         )?;
         worker.database.insert_wallet_report(wallet_report)?;
         Ok(())
