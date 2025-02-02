@@ -198,6 +198,18 @@ pub struct Reputation {
 }
 
 impl Reputation {
+    fn calc_rating_score(penalties: &Vec<ReputationPenalty>) -> i32 {
+        penalties.iter().fold(1000, |score, penalty| {
+            score
+                - match penalty.severity {
+                    PenaltySeverity::High => 250,
+                    PenaltySeverity::Medium => 150,
+                    PenaltySeverity::Low => 50,
+                    PenaltySeverity::None => 0,
+                }
+        })
+    }
+
     pub fn new_from_wallet(wallet: &Wallet) -> Self {
         let mut penalties: Vec<ReputationPenalty> = vec![];
         // add penalties
@@ -213,15 +225,7 @@ impl Reputation {
             PrioritizationFeesMetrics::calculate(&wallet.prioritization_fees).into();
         penalties.extend([fee_penalty_1, fee_penalty_2]);
 
-        let rating_score = penalties.iter().fold(1000, |score, penalty| {
-            score
-                - match penalty.severity {
-                    PenaltySeverity::High => 250,
-                    PenaltySeverity::Medium => 150,
-                    PenaltySeverity::Low => 50,
-                    PenaltySeverity::None => 0,
-                }
-        });
+        let rating_score = Self::calc_rating_score(&penalties);
 
         Self {
             penalties,
