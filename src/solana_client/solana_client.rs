@@ -105,4 +105,21 @@ impl SolanaClient {
         confirmed_transactions
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::wallet::wallet::Wallet;
+    
+    use super::*;
+    use dotenv::dotenv;
+
+    const TEST_WALLET_ADDR: &str = "HABhDh9zrzf8mA4SBo1yro8M6AirH2hZdLNPpuvMH6iA";
+
+    #[tokio::test]
+    async fn test_batch_process_transactions() {
+        dotenv().ok();
+        let solana_client = SolanaClient::new();
+        let wallet = Wallet::new(TEST_WALLET_ADDR, &solana_client).await;
+        let _ = solana_client.batch_process_transactions(wallet.transaction_history).await;
+    }
 }
