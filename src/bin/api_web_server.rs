@@ -148,4 +148,18 @@ mod tests {
         // Without proper database setup, this should return an Internal Server Error.
         assert_eq!(resp.status(), StatusCode::INTERNAL_SERVER_ERROR);
     }
+
+    #[actix_web::test]
+    async fn test_get_wallet_report_case_report_endpoint() {
+        // Initialize the app with the case report endpoint
+        let app =
+            test::init_service(App::new().service(get_wallet_report_case_report_endpoint)).await;
+        let uuid = Uuid::new_v4();
+        let req = test::TestRequest::get()
+            .uri(&format!("/get_wallet_report_case_report/{}", uuid))
+            .to_request();
+        let resp = test::call_service(&app, req).await;
+        // Expecting fallback error response due to missing dependencies
+        assert_eq!(resp.status(), StatusCode::INTERNAL_SERVER_ERROR);
+    }
 }
