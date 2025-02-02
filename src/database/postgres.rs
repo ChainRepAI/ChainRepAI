@@ -1,9 +1,7 @@
 use anyhow::Result;
 use chrono::NaiveDateTime;
 use diesel::{
-    dsl::insert_into,
-    query_dsl::methods::{FilterDsl, SelectDsl},
-    Connection, ExpressionMethods, PgConnection, RunQueryDsl,
+    dsl::insert_into, Connection, ExpressionMethods, PgConnection, QueryDsl, RunQueryDsl,
 };
 use serde_json::from_value;
 use uuid::Uuid;
@@ -30,7 +28,6 @@ impl Database {
         insert_into(wallet_report::table)
             .values(wallet_report)
             .execute(&mut self.conn)?;
-
         Ok(())
     }
 
@@ -78,5 +75,13 @@ impl Database {
             .select(wallet_report::all_columns)
             .first::<WalletReport>(&mut self.conn)?
             .report_creation_date)
+    }
+
+    pub fn get_wallet_report_count(&mut self, wallet_addr: String) -> i64 {
+        wallet_report::table
+            .filter(wallet_report::wallet_addr.eq(wallet_addr))
+            .count()
+            .get_result::<i64>(&mut self.conn)
+            .unwrap_or_else(|_| 0)
     }
 }
