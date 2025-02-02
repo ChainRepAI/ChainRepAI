@@ -113,9 +113,10 @@ On the other hand, transactions involving well-established wallets—those with 
     DATABASE_URL="postgres://localhost/db_name"
     ```
 
-3. Postgres running with the required database created (name specified in the .env file)
-4. Pulsar running
-5. In separate terminals, run the following commands to start the binaries:
+3. Edit the diesel.toml, providing the correct directory path
+4. Postgres running with the required database created (name specified in the .env file)
+5. Pulsar running
+6. In separate terminals, run the following commands to start the binaries:
     ```console
     cargo run --bin api_web_server
     cargo run --bin report_worker
