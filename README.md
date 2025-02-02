@@ -114,6 +114,10 @@ On the other hand, transactions involving well-established wallets—those with 
     ```
 
 3. Edit the diesel.toml, providing the correct directory path
+    ```
+    [migrations_directory]
+    dir = "<path to migrations directory>"
+    ```
 4. Postgres running with the required database created (name specified in the .env file)
 5. Pulsar running
 6. In separate terminals, run the following commands to start the binaries:
