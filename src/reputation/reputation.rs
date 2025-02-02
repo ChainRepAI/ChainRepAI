@@ -7,6 +7,9 @@ use solana_client::rpc_response::{
 
 use crate::{database::models::RatingClassification, wallet::wallet::Wallet};
 
+pub struct WalletBalanceVolatility(f64);
+
+
 pub struct WalletBalance(u64);
 
 pub struct TxPerHour(i64);
