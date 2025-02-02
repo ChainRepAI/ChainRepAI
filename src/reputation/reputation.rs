@@ -421,4 +421,24 @@ mod tests {
             );
         }
     }
+
+    #[test]
+    fn test_transaction_failure_rate() {
+        let test_cases = vec![
+            (vec![], 0.0),                     // Empty history
+            (vec![false], 0.0),                // One successful transaction
+            (vec![true], 100.0),               // One failed transaction
+            (vec![false, false, true], 33.33), // Mixed case
+        ];
+
+        for (failure_pattern, expected_rate) in test_cases {
+            let transactions: Vec<RpcConfirmedTransactionStatusWithSignature> = failure_pattern
+                .into_iter()
+                .map(|failed| create_mock_transaction(Some(1000), failed))
+                .collect();
+
+            let failure_rate = TransactionFailureRate::calculate(&transactions);
+            assert!((failure_rate.0 - expected_rate).abs() < 0.01);
+        }
+    }
 }
