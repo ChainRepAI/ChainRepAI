@@ -441,4 +441,23 @@ mod tests {
             assert!((failure_rate.0 - expected_rate).abs() < 0.01);
         }
     }
+
+    #[test]
+    fn test_prioritization_fees_metrics() {
+        let fees = vec![
+            RpcPrioritizationFee { slot: 0, prioritization_fee: 1 },
+            RpcPrioritizationFee { slot: 0, prioritization_fee: 2 },
+            RpcPrioritizationFee { slot: 0, prioritization_fee: 3 },
+            RpcPrioritizationFee { slot: 0, prioritization_fee: 4 },
+            RpcPrioritizationFee { slot: 0, prioritization_fee: 5 },
+        ];
+        let metrics = PrioritizationFeesMetrics::calculate(&fees);
+
+        // Test average calculation
+        assert!((metrics.avg_fee - 3.0).abs() < 0.001);
+        
+        // Test standard deviation calculation
+        let expected_std_dev = (10.0f64).sqrt();
+        assert!((metrics.std_deviation - expected_std_dev).abs() < 2.0);
+    }
 }
