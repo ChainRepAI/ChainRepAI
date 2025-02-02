@@ -1,7 +1,9 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::Serialize;
-use solana_client::rpc_response::{RpcConfirmedTransactionStatusWithSignature, RpcPrioritizationFee};
+use solana_client::rpc_response::{
+    RpcConfirmedTransactionStatusWithSignature, RpcPrioritizationFee,
+};
 
 use crate::{database::models::RatingClassification, wallet::wallet::Wallet};
 
@@ -11,7 +13,9 @@ pub struct TxPerHour(i64);
 
 impl TxPerHour {
     /// Calculates transaction volume over last 1000 transactions
-    pub fn calculate(transaction_history: &Vec<RpcConfirmedTransactionStatusWithSignature>) -> Self {
+    pub fn calculate(
+        transaction_history: &Vec<RpcConfirmedTransactionStatusWithSignature>,
+    ) -> Self {
         let num_hours = transaction_history
             .first()
             .and_then(|first_tx| first_tx.block_time)
@@ -29,8 +33,10 @@ impl TxPerHour {
 pub struct DaysSinceLastBlock(u64);
 
 impl DaysSinceLastBlock {
-    pub fn calculate(transaction_history: &Vec<RpcConfirmedTransactionStatusWithSignature>) -> Option<Self> {
-            transaction_history
+    pub fn calculate(
+        transaction_history: &Vec<RpcConfirmedTransactionStatusWithSignature>,
+    ) -> Option<Self> {
+        transaction_history
             .last()
             .and_then(|last_tx| last_tx.block_time)
             .map(|block_time| {
@@ -79,7 +85,9 @@ impl PrioritizationFeesMetrics {
 pub struct TransactionFailureRate(f64);
 
 impl TransactionFailureRate {
-    pub fn calculate(transaction_history: &Vec<RpcConfirmedTransactionStatusWithSignature>) -> Self {        
+    pub fn calculate(
+        transaction_history: &Vec<RpcConfirmedTransactionStatusWithSignature>,
+    ) -> Self {
         if transaction_history.is_empty() {
             return Self(0.0);
         }
@@ -119,7 +127,8 @@ impl Reputation {
                 .into(),
         );
         penalties.push(TransactionFailureRate::calculate(&wallet.transaction_history).into());
-        let (fee_penalty_1, fee_penalty_2) = PrioritizationFeesMetrics::calculate(&wallet.prioritization_fees).into();
+        let (fee_penalty_1, fee_penalty_2) =
+            PrioritizationFeesMetrics::calculate(&wallet.prioritization_fees).into();
         penalties.extend([fee_penalty_1, fee_penalty_2]);
 
         let rating_score = penalties.iter().fold(1000, |score, penalty| {
@@ -339,7 +348,11 @@ mod tests {
         RpcConfirmedTransactionStatusWithSignature {
             signature: String::new(),
             slot: 0,
-            err: if has_error { Some(solana_sdk::transaction::TransactionError::AccountBorrowOutstanding) } else { None },
+            err: if has_error {
+                Some(solana_sdk::transaction::TransactionError::AccountBorrowOutstanding)
+            } else {
+                None
+            },
             memo: None,
             block_time,
             confirmation_status: None,
@@ -376,6 +389,7 @@ mod tests {
         let tx_per_hour = TxPerHour::calculate(&transactions);
         assert_eq!(tx_per_hour.0, 10);
     }
+
     #[test]
     fn test_tx_per_hour_penalties() {
         let test_cases = vec![
@@ -445,17 +459,32 @@ mod tests {
     #[test]
     fn test_prioritization_fees_metrics() {
         let fees = vec![
-            RpcPrioritizationFee { slot: 0, prioritization_fee: 1 },
-            RpcPrioritizationFee { slot: 0, prioritization_fee: 2 },
-            RpcPrioritizationFee { slot: 0, prioritization_fee: 3 },
-            RpcPrioritizationFee { slot: 0, prioritization_fee: 4 },
-            RpcPrioritizationFee { slot: 0, prioritization_fee: 5 },
+            RpcPrioritizationFee {
+                slot: 0,
+                prioritization_fee: 1,
+            },
+            RpcPrioritizationFee {
+                slot: 0,
+                prioritization_fee: 2,
+            },
+            RpcPrioritizationFee {
+                slot: 0,
+                prioritization_fee: 3,
+            },
+            RpcPrioritizationFee {
+                slot: 0,
+                prioritization_fee: 4,
+            },
+            RpcPrioritizationFee {
+                slot: 0,
+                prioritization_fee: 5,
+            },
         ];
         let metrics = PrioritizationFeesMetrics::calculate(&fees);
 
         // Test average calculation
         assert!((metrics.avg_fee - 3.0).abs() < 0.001);
-        
+
         // Test standard deviation calculation
         let expected_std_dev = (10.0f64).sqrt();
         assert!((metrics.std_deviation - expected_std_dev).abs() < 2.0);
