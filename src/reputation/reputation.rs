@@ -326,10 +326,25 @@ impl From<PrioritizationFeesMetrics> for (ReputationPenalty, ReputationPenalty) 
         )
     }
 }
+
 #[cfg(test)]
 mod tests {
     use super::*;
     use solana_client::rpc_response::RpcConfirmedTransactionStatusWithSignature;
+
+    fn create_mock_transaction(
+        block_time: Option<i64>,
+        has_error: bool,
+    ) -> RpcConfirmedTransactionStatusWithSignature {
+        RpcConfirmedTransactionStatusWithSignature {
+            signature: String::new(),
+            slot: 0,
+            err: if has_error { Some(solana_sdk::transaction::TransactionError::AccountBorrowOutstanding) } else { None },
+            memo: None,
+            block_time,
+            confirmation_status: None,
+        }
+    }
 
     #[test]
     fn test_wallet_balance_penalties() {
@@ -352,4 +367,13 @@ mod tests {
         }
     }
 
+    #[test]
+    fn test_tx_per_hour_calculation() {
+        // Test case with 10 transactions over 2 hours
+        let transactions: Vec<RpcConfirmedTransactionStatusWithSignature> = (0..10)
+            .map(|i| create_mock_transaction(Some(1000 + i * 720), false))
+            .collect();
+        let tx_per_hour = TxPerHour::calculate(&transactions);
+        assert_eq!(tx_per_hour.0, 10);
+    }
 }
