@@ -9,8 +9,8 @@ use uuid::Uuid;
 use crate::case_report::case_report::CaseReport;
 
 use super::{
-    models::{RatingClassification, WalletReport},
-    schema::wallet_report,
+    models::{RatingClassification, WalletMetrics, WalletReport},
+    schema::{wallet_metrics, wallet_report},
 };
 
 pub struct Database {
@@ -83,5 +83,12 @@ impl Database {
             .count()
             .get_result::<i64>(&mut self.conn)
             .unwrap_or_else(|_| 0)
+    }
+
+    pub fn insert_wallet_metrics(&mut self, wallet_metrics: WalletMetrics) -> Result<()> {
+        insert_into(wallet_metrics::table)
+            .values(wallet_metrics)
+            .execute(&mut self.conn)?;
+        Ok(())
     }
 }
