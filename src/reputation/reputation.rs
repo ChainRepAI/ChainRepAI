@@ -1,6 +1,7 @@
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use serde::Serialize;
+use solana_client::rpc_response::{RpcConfirmedTransactionStatusWithSignature, RpcPrioritizationFee};
 
 use crate::{database::models::RatingClassification, wallet::wallet::Wallet};
 
@@ -10,8 +11,7 @@ pub struct TxPerHour(i64);
 
 impl TxPerHour {
     /// Calculates transaction volume over last 1000 transactions
-    pub fn calculate(wallet: &Wallet) -> Self {
-        let transaction_history = &wallet.transaction_history;
+    pub fn calculate(transaction_history: &Vec<RpcConfirmedTransactionStatusWithSignature>) -> Self {
         let num_hours = transaction_history
             .first()
             .and_then(|first_tx| first_tx.block_time)
@@ -29,9 +29,8 @@ impl TxPerHour {
 pub struct DaysSinceLastBlock(u64);
 
 impl DaysSinceLastBlock {
-    pub fn calculate(wallet: &Wallet) -> Option<Self> {
-        wallet
-            .transaction_history
+    pub fn calculate(transaction_history: &Vec<RpcConfirmedTransactionStatusWithSignature>) -> Option<Self> {
+            transaction_history
             .last()
             .and_then(|last_tx| last_tx.block_time)
             .map(|block_time| {
@@ -52,9 +51,8 @@ pub struct PrioritizationFeesMetrics {
 }
 
 impl PrioritizationFeesMetrics {
-    pub fn calculate(wallet: &Wallet) -> Self {
-        let fees: Vec<f64> = wallet
-            .prioritization_fees
+    pub fn calculate(prioritization_fees: &Vec<RpcPrioritizationFee>) -> Self {
+        let fees: Vec<f64> = prioritization_fees
             .iter()
             .map(|fee| fee.prioritization_fee as f64)
             .collect();
@@ -81,10 +79,7 @@ impl PrioritizationFeesMetrics {
 pub struct TransactionFailureRate(f64);
 
 impl TransactionFailureRate {
-    pub fn calculate(wallet: &Wallet) -> Self {
-        let transaction_history: &Vec<
-            solana_client::rpc_response::RpcConfirmedTransactionStatusWithSignature,
-        > = &wallet.transaction_history;
+    pub fn calculate(transaction_history: &Vec<RpcConfirmedTransactionStatusWithSignature>) -> Self {        
         if transaction_history.is_empty() {
             return Self(0.0);
         }
@@ -116,15 +111,15 @@ impl Reputation {
     pub fn new_from_wallet(wallet: &Wallet) -> Self {
         let mut penalties: Vec<ReputationPenalty> = vec![];
         // add penalties
-        penalties.push(TxPerHour::calculate(&wallet).into());
+        penalties.push(TxPerHour::calculate(&wallet.transaction_history).into());
         penalties.push(WalletBalance(wallet.account_balance).into());
         penalties.push(
-            DaysSinceLastBlock::calculate(&wallet)
+            DaysSinceLastBlock::calculate(&wallet.transaction_history)
                 .unwrap_or_else(|| DaysSinceLastBlock(std::u64::MAX))
                 .into(),
         );
-        penalties.push(TransactionFailureRate::calculate(&wallet).into());
-        let (fee_penalty_1, fee_penalty_2) = PrioritizationFeesMetrics::calculate(&wallet).into();
+        penalties.push(TransactionFailureRate::calculate(&wallet.transaction_history).into());
+        let (fee_penalty_1, fee_penalty_2) = PrioritizationFeesMetrics::calculate(&wallet.prioritization_fees).into();
         penalties.extend([fee_penalty_1, fee_penalty_2]);
 
         let rating_score = penalties.iter().fold(1000, |score, penalty| {
@@ -145,7 +140,7 @@ impl Reputation {
     }
 }
 
-#[derive(Serialize, Clone, Copy)]
+#[derive(Serialize, Clone, Copy, Debug)]
 pub enum PenaltySeverity {
     High,
     Medium,
