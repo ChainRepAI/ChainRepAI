@@ -380,6 +380,36 @@ impl From<PrioritizationFeesMetrics> for (ReputationPenalty, ReputationPenalty) 
     }
 }
 
+impl From<WalletBalanceVolatility> for ReputationPenalty {
+    fn from(balance_volatility: WalletBalanceVolatility) -> Self {
+        let (severity, mut reasoning) = match balance_volatility.0 {
+            f if f > 25.0 => (
+                PenaltySeverity::High,
+                vec!["Very high standard deviation in balance volatility".to_string()],
+            ),
+            f if f > 10.0 => (
+                PenaltySeverity::Medium,
+                vec!["Medium standard deviation in balance volatility".to_string()],
+            ),
+            f if f > 5.0 => (
+                PenaltySeverity::Low,
+                vec!["Low standard deviation in balance volatility".to_string()],
+            ),
+            _ => (
+                PenaltySeverity::None,
+                vec!["Very low standard deviation in balance volatility".to_string()],
+            ),
+        };
+        reasoning.push(format!(
+            "Balance volatility standard deviation: {:?}",
+            balance_volatility.0
+        ));
+
+        Self {severity, reasoning}
+    }
+}
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
