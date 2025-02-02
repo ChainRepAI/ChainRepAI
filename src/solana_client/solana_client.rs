@@ -1,3 +1,4 @@
+use futures::future::join_all;
 use solana_client::{
     client_error::ClientError,
     nonblocking::rpc_client::RpcClient,
@@ -8,6 +9,8 @@ use solana_client::{
 use solana_sdk::{account::Account, pubkey::Pubkey, signature::Signature};
 use solana_transaction_status::{EncodedConfirmedTransactionWithStatusMeta, UiTransactionEncoding};
 use std::{env, str::FromStr};
+
+const CHUNK_SIZE: usize = 100;
 
 pub struct SolanaClient {
     client: RpcClient,
@@ -66,4 +69,40 @@ impl SolanaClient {
             .get_recent_prioritization_fees(&[*pub_key])
             .await
     }
+
+    pub async fn batch_process_transactions(
+        &self,
+        signatures: Vec<RpcConfirmedTransactionStatusWithSignature>,
+    ) -> Vec<EncodedConfirmedTransactionWithStatusMeta> {
+        let mut confirmed_transactions = Vec::new();
+
+        // Process the signatures in defined chunk sizes.
+        for chunk in signatures.chunks(CHUNK_SIZE) {
+            // Create a batch of asynchronous tasks for parallel processing.
+            let futures = chunk.iter().map(|sig_info| {
+                // Clone the signature string to move it into the async block.
+                let sig_clone = sig_info.signature.clone();
+                // An async move block to ensure the signature's lifetime is properly contained.
+                async move {
+                    let signature = Signature::from_str(&sig_clone)
+                        .expect("Invalid signature format");
+                    self.client
+                        .get_transaction(&signature, UiTransactionEncoding::Json)
+                        .await
+                }
+            });
+
+            // Await all tasks concurrently and filter out failures.
+            let results: Vec<_> = join_all(futures)
+                .await
+                .into_iter()
+                .filter_map(|tx_result| tx_result.ok())
+                .collect();
+
+            confirmed_transactions.extend(results);
+        }
+
+        confirmed_transactions
+    }
+}
 }
