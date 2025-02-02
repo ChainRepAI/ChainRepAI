@@ -8,6 +8,9 @@ use solana_transaction_status::EncodedConfirmedTransactionWithStatusMeta;
 
 use crate::{database::models::RatingClassification, wallet::wallet::Wallet};
 
+pub struct TransactionsWithNewWallets (f64);
+
+
 pub struct WalletBalanceVolatility(f64);
 
 impl WalletBalanceVolatility {
