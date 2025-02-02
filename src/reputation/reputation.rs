@@ -4,11 +4,52 @@ use serde::Serialize;
 use solana_client::rpc_response::{
     RpcConfirmedTransactionStatusWithSignature, RpcPrioritizationFee,
 };
+use solana_transaction_status::EncodedConfirmedTransactionWithStatusMeta;
 
 use crate::{database::models::RatingClassification, wallet::wallet::Wallet};
 
 pub struct WalletBalanceVolatility(f64);
 
+impl WalletBalanceVolatility {
+    pub fn calculate(
+        confirmed_transactions: Vec<EncodedConfirmedTransactionWithStatusMeta>,
+    ) -> Self {
+        let balances: Vec<f64> = confirmed_transactions
+            .iter()
+            .filter_map(|tx| {
+                // Check if metadata exists and contains at least one balance in post_balances.
+                tx.transaction.meta.as_ref()
+                    .and_then(|meta| meta.post_balances.get(0))
+                    .map(|balance| *balance as f64)
+            })
+            .collect();
+
+        // if there are no valid balance entries, return zero volatility
+        if balances.is_empty() {
+            return Self(0.0);
+        }
+
+        // Calculate mean of the balances
+        let sum: f64 = balances.iter().sum();
+        let count = balances.len() as f64;
+        let mean = sum / count;
+
+        // Compute the variance: average of squared differences from the mean
+        let variance_sum: f64 = balances
+            .iter()
+            .map(|balance| {
+                let diff = balance - mean;
+                diff * diff
+            })
+            .sum();
+        let variance = variance_sum / count;
+
+        // Volatility is the standard deviation
+        let volatility = variance.sqrt();
+
+        Self(volatility)
+    }
+}
 
 pub struct WalletBalance(u64);
 
