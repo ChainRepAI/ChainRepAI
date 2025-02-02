@@ -117,3 +117,21 @@ async fn main() -> std::io::Result<()> {
     .run()
     .await
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use actix_web::{http::StatusCode, test, App};
+    use uuid::Uuid;
+
+    #[actix_web::test]
+    async fn test_health_check() {
+        // Initialize the app with the health_check endpoint
+        let app = test::init_service(App::new().service(health_check)).await;
+        // Create a GET request for /health
+        let req = test::TestRequest::get().uri("/health").to_request();
+        let resp = test::call_service(&app, req).await;
+        // Expect a 200 OK response
+        assert_eq!(resp.status(), StatusCode::OK);
+    }
+}
