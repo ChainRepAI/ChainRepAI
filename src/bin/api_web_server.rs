@@ -202,4 +202,17 @@ mod tests {
         // Expect error response because the real database connection is not available
         assert_eq!(resp.status(), StatusCode::INTERNAL_SERVER_ERROR);
     }
+
+    #[actix_web::test]
+    async fn test_start_wallet_report_endpoint() {
+        // Initialize the app with the start_wallet_report endpoint
+        let app = test::init_service(App::new().service(start_wallet_report_endpoint)).await;
+        let fake_wallet_addr = "fake_wallet_address";
+        let req = test::TestRequest::post()
+            .uri(&format!("/start_wallet_report/{}", fake_wallet_addr))
+            .to_request();
+        let resp = test::call_service(&app, req).await;
+        // As PulsarClient and database dependencies are not configured, we expect an Internal Server Error
+        assert_eq!(resp.status(), StatusCode::INTERNAL_SERVER_ERROR);
+    }
 }
