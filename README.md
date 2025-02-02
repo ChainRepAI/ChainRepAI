@@ -2,10 +2,7 @@
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/w/SolAnalystAI/SolAnalystAI) ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/SolAnalystAI/SolAnalystAI)
  ![GitHub License](https://img.shields.io/github/license/SolAnalystAI/SolAnalystAI) ![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/SolAnalystAI) 
 
-
-
-
- # SolAnalystAI
+# SolAnalystAI
 
  ![image](images/banner-header.png)
 
