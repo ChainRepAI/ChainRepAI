@@ -23,6 +23,7 @@ dependencies = [
  "dotenv",
  "futures",
  "pulsar",
+ "rayon",
  "reqwest 0.12.12",
  "serde",
  "serde_json",
