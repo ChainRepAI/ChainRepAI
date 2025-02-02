@@ -5,8 +5,12 @@ use solana_client::rpc_response::{
     RpcConfirmedTransactionStatusWithSignature, RpcPrioritizationFee,
 };
 use solana_transaction_status::EncodedConfirmedTransactionWithStatusMeta;
+use uuid::Uuid;
 
-use crate::{database::models::RatingClassification, wallet::wallet::Wallet};
+use crate::{
+    database::models::{RatingClassification, WalletMetrics},
+    wallet::wallet::Wallet,
+};
 
 pub struct TransactionsWithNewWallets(f64);
 
@@ -192,9 +196,11 @@ impl TransactionFailureRate {
 
 #[derive(Serialize, Clone)]
 pub struct Reputation {
+    pub id: Uuid,
     pub penalties: Vec<ReputationPenalty>,
     pub rating_score: i32,
     pub rating_classification: RatingClassification,
+    pub wallet_metrics: WalletMetrics,
 }
 
 impl Reputation {
@@ -210,27 +216,41 @@ impl Reputation {
         })
     }
 
-    pub fn new_from_wallet(wallet: &Wallet) -> Self {
+    pub fn new_from_wallet(wallet: &Wallet, id: Uuid) -> Self {
+        // calculate metrics/indicators
+        let tx_per_hour = TxPerHour::calculate(&wallet.transaction_history);
+        let wallet_balance = WalletBalance(wallet.account_balance);
+        let days_since_last_block = DaysSinceLastBlock::calculate(&wallet.transaction_history)
+            .unwrap_or_else(|| DaysSinceLastBlock(std::u64::MAX));
+        let transaction_failure_rate =
+            TransactionFailureRate::calculate(&wallet.transaction_history);
+        let prio_fee_metrics = PrioritizationFeesMetrics::calculate(&wallet.prioritization_fees);
+
         let mut penalties: Vec<ReputationPenalty> = vec![];
         // add penalties
-        penalties.push(TxPerHour::calculate(&wallet.transaction_history).into());
-        penalties.push(WalletBalance(wallet.account_balance).into());
-        penalties.push(
-            DaysSinceLastBlock::calculate(&wallet.transaction_history)
-                .unwrap_or_else(|| DaysSinceLastBlock(std::u64::MAX))
-                .into(),
-        );
-        penalties.push(TransactionFailureRate::calculate(&wallet.transaction_history).into());
-        let (fee_penalty_1, fee_penalty_2) =
-            PrioritizationFeesMetrics::calculate(&wallet.prioritization_fees).into();
+        penalties.push((&tx_per_hour).into());
+        penalties.push((&wallet_balance).into());
+        penalties.push((&days_since_last_block).into());
+        penalties.push((&transaction_failure_rate).into());
+        let (fee_penalty_1, fee_penalty_2) = (&prio_fee_metrics).into();
         penalties.extend([fee_penalty_1, fee_penalty_2]);
 
         let rating_score = Self::calc_rating_score(&penalties);
 
         Self {
+            id,
             penalties,
             rating_score,
             rating_classification: rating_score.into(),
+            wallet_metrics: WalletMetrics {
+                wallet_report_id: id,
+                transaction_failure_rate: transaction_failure_rate.0,
+                avg_prio_fee: prio_fee_metrics.avg_fee,
+                prio_fee_std_devi: prio_fee_metrics.std_deviation,
+                days_since_last_block: days_since_last_block.0 as i64,
+                tx_per_hour: tx_per_hour.0,
+                wallet_balance: wallet_balance.0 as i64,
+            },
         }
     }
 }
@@ -249,8 +269,8 @@ pub struct ReputationPenalty {
     reasoning: Vec<String>,
 }
 
-impl From<WalletBalance> for ReputationPenalty {
-    fn from(balance: WalletBalance) -> Self {
+impl From<&WalletBalance> for ReputationPenalty {
+    fn from(balance: &WalletBalance) -> Self {
         let (severity, mut reasoning) = match balance.0 {
             b if b < 001000000000 => (
                 PenaltySeverity::High,
@@ -280,8 +300,8 @@ impl From<WalletBalance> for ReputationPenalty {
 /// Good transaction volume indicates high reputation
 /// Too high volume indicates automation and hence, lower reputation
 /// No volume indicates no reputation
-impl From<TxPerHour> for ReputationPenalty {
-    fn from(tx_per_hour: TxPerHour) -> Self {
+impl From<&TxPerHour> for ReputationPenalty {
+    fn from(tx_per_hour: &TxPerHour) -> Self {
         let (severity, mut reasoning) = match tx_per_hour.0 {
             v if v == 0 => (
                 PenaltySeverity::High,
@@ -308,8 +328,8 @@ impl From<TxPerHour> for ReputationPenalty {
     }
 }
 
-impl From<DaysSinceLastBlock> for ReputationPenalty {
-    fn from(days: DaysSinceLastBlock) -> Self {
+impl From<&DaysSinceLastBlock> for ReputationPenalty {
+    fn from(days: &DaysSinceLastBlock) -> Self {
         let (severity, mut reasoning) = match days.0 {
             d if d == 0 => (
                 PenaltySeverity::None,
@@ -336,8 +356,8 @@ impl From<DaysSinceLastBlock> for ReputationPenalty {
     }
 }
 
-impl From<TransactionFailureRate> for ReputationPenalty {
-    fn from(failure_rate: TransactionFailureRate) -> Self {
+impl From<&TransactionFailureRate> for ReputationPenalty {
+    fn from(failure_rate: &TransactionFailureRate) -> Self {
         let (severity, mut reasoning) = match failure_rate.0 {
             f if f > 10.0 => (
                 PenaltySeverity::High,
@@ -364,8 +384,8 @@ impl From<TransactionFailureRate> for ReputationPenalty {
     }
 }
 
-impl From<PrioritizationFeesMetrics> for (ReputationPenalty, ReputationPenalty) {
-    fn from(pfm: PrioritizationFeesMetrics) -> Self {
+impl From<&PrioritizationFeesMetrics> for (ReputationPenalty, ReputationPenalty) {
+    fn from(pfm: &PrioritizationFeesMetrics) -> Self {
         let (avg_fee_severity, mut avg_fee_reasoning) = match pfm.avg_fee {
             f if f > 10.0 => (
                 PenaltySeverity::None,
@@ -422,8 +442,8 @@ impl From<PrioritizationFeesMetrics> for (ReputationPenalty, ReputationPenalty) 
     }
 }
 
-impl From<WalletBalanceVolatility> for ReputationPenalty {
-    fn from(balance_volatility: WalletBalanceVolatility) -> Self {
+impl From<&WalletBalanceVolatility> for ReputationPenalty {
+    fn from(balance_volatility: &WalletBalanceVolatility) -> Self {
         let (severity, mut reasoning) = match balance_volatility.0 {
             f if f > 25.0 => (
                 PenaltySeverity::High,
@@ -454,8 +474,8 @@ impl From<WalletBalanceVolatility> for ReputationPenalty {
     }
 }
 
-impl From<TransactionsWithNewWallets> for ReputationPenalty {
-    fn from(transactions_with_new_wallets: TransactionsWithNewWallets) -> Self {
+impl From<&TransactionsWithNewWallets> for ReputationPenalty {
+    fn from(transactions_with_new_wallets: &TransactionsWithNewWallets) -> Self {
         let (severity, mut reasoning) = match transactions_with_new_wallets.0 {
             p if p > 30.0 => (
                 PenaltySeverity::High,
@@ -518,7 +538,7 @@ mod tests {
         ];
 
         for (balance, expected_severity) in test_cases {
-            let penalty: ReputationPenalty = WalletBalance(balance).into();
+            let penalty: ReputationPenalty = (&WalletBalance(balance)).into();
             assert_eq!(
                 std::mem::discriminant(&penalty.severity),
                 std::mem::discriminant(&expected_severity),
@@ -549,7 +569,7 @@ mod tests {
         ];
 
         for (tx_per_hour, expected_severity) in test_cases {
-            let penalty: ReputationPenalty = TxPerHour(tx_per_hour).into();
+            let penalty: ReputationPenalty = (&TxPerHour(tx_per_hour)).into();
             assert_eq!(
                 std::mem::discriminant(&penalty.severity),
                 std::mem::discriminant(&expected_severity),
@@ -577,7 +597,7 @@ mod tests {
         for (block_time, expected_severity) in test_cases {
             let transactions = vec![create_mock_transaction(Some(block_time as i64), false)];
             let days = DaysSinceLastBlock::calculate(&transactions).unwrap();
-            let penalty: ReputationPenalty = days.into();
+            let penalty: ReputationPenalty = (&days).into();
             assert_eq!(
                 std::mem::discriminant(&penalty.severity),
                 std::mem::discriminant(&expected_severity),
