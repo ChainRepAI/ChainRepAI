@@ -35,7 +35,7 @@ impl DeserializeMessage for WalletReportJob {
 impl WalletReportJob {
     pub async fn do_job(&self, worker: &mut WalletReportWorker) -> Result<()> {
         let wallet = Wallet::new(self.wallet_addr.as_str(), &worker.solana_client).await;
-        let reputation = Reputation::new_from_wallet(&wallet);
+        let reputation = Reputation::new_from_wallet(&wallet, self.report_id.clone());
         let case_report = CaseReport::new(&worker.openai_client, &reputation, wallet).await?;
         let wallet_report = WalletReport::new(
             self.report_id,
@@ -45,6 +45,9 @@ impl WalletReportJob {
             self.wallet_addr.clone(),
         )?;
         worker.database.insert_wallet_report(wallet_report)?;
+        worker
+            .database
+            .insert_wallet_metrics(reputation.wallet_metrics)?;
         Ok(())
     }
 }
