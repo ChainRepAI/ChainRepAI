@@ -446,6 +446,31 @@ impl From<WalletBalanceVolatility> for ReputationPenalty {
     }
 }
 
+impl From<TransactionsWithNewWallets> for ReputationPenalty {
+    fn from(transactions_with_new_wallets: TransactionsWithNewWallets) -> Self {
+        let (severity, mut reasoning) = match transactions_with_new_wallets.0 {
+            p if p > 30.0 => (
+                PenaltySeverity::High,
+                vec!["Very high % of transactions with new wallets".to_string()],
+            ),
+            p if p > 20.0 => (
+                PenaltySeverity::High,
+                vec!["Medium/high % of transactions with new wallets".to_string()],
+            ),
+            p if p > 10.0 => (
+                PenaltySeverity::High,
+                vec!["Low % of transactions with new wallets".to_string()],
+            ),
+            _ => (
+                PenaltySeverity::None,
+                vec!["Very low % of transactions with new wallets".to_string()],
+            )
+        };  
+        reasoning.push(format!("% Transactions with new wallets: {:?}", transactions_with_new_wallets.0));
+        Self {severity, reasoning}
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
