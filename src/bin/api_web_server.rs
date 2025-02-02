@@ -175,4 +175,18 @@ mod tests {
         // Expect error response due to unconfigured database connection
         assert_eq!(resp.status(), StatusCode::INTERNAL_SERVER_ERROR);
     }
+
+    #[actix_web::test]
+    async fn test_get_wallet_report_classification_endpoint() {
+        // Initialize the app with the classification endpoint
+        let app =
+            test::init_service(App::new().service(get_wallet_report_classification_endpoint)).await;
+        let uuid = Uuid::new_v4();
+        let req = test::TestRequest::get()
+            .uri(&format!("/get_wallet_report_classification/{}", uuid))
+            .to_request();
+        let resp = test::call_service(&app, req).await;
+        // Expect Internal Server Error response because dependencies are not mocked
+        assert_eq!(resp.status(), StatusCode::INTERNAL_SERVER_ERROR);
+    }
 }
