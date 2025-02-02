@@ -134,4 +134,18 @@ mod tests {
         // Expect a 200 OK response
         assert_eq!(resp.status(), StatusCode::OK);
     }
+
+    #[actix_web::test]
+    async fn test_get_wallet_report_creation_date_endpoint() {
+        // Initialize the app with the creation date endpoint
+        let app =
+            test::init_service(App::new().service(get_wallet_report_creation_date_endpoint)).await;
+        let uuid = Uuid::new_v4();
+        let req = test::TestRequest::get()
+            .uri(&format!("/get_wallet_report_creation_date/{}", uuid))
+            .to_request();
+        let resp = test::call_service(&app, req).await;
+        // Without proper database setup, this should return an Internal Server Error.
+        assert_eq!(resp.status(), StatusCode::INTERNAL_SERVER_ERROR);
+    }
 }
