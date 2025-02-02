@@ -8,7 +8,7 @@ use solana_transaction_status::EncodedConfirmedTransactionWithStatusMeta;
 
 use crate::{database::models::RatingClassification, wallet::wallet::Wallet};
 
-pub struct TransactionsWithNewWallets (f64);
+pub struct TransactionsWithNewWallets(f64);
 
 impl TransactionsWithNewWallets {
     pub fn calculate(
@@ -17,17 +17,21 @@ impl TransactionsWithNewWallets {
         let total = confirmed_transactions.len();
 
         // Count transactions that include at least one account that appears to be newly funded.
-        let count_new_wallets: usize = confirmed_transactions.iter().filter(|tx| {
-            if let Some(meta) = &tx.transaction.meta {
-                // Here we assume that meta includes pre_balances and post_balances as vectors of u64.
-                // A new wallet is assumed if any account's pre_balance is 0 and post_balance > 0.
-                meta.pre_balances.iter()
-                    .zip(meta.post_balances.iter())
-                    .any(|(&pre, &post)| pre == 0 && post > 0)
-            } else {
-                false
-            }
-        }).count();
+        let count_new_wallets: usize = confirmed_transactions
+            .iter()
+            .filter(|tx| {
+                if let Some(meta) = &tx.transaction.meta {
+                    // Here we assume that meta includes pre_balances and post_balances as vectors of u64.
+                    // A new wallet is assumed if any account's pre_balance is 0 and post_balance > 0.
+                    meta.pre_balances
+                        .iter()
+                        .zip(meta.post_balances.iter())
+                        .any(|(&pre, &post)| pre == 0 && post > 0)
+                } else {
+                    false
+                }
+            })
+            .count();
 
         // Calculate the percentage; if there are no transactions, result defaults to 0.0.
         let percentage = if total > 0 {
@@ -464,10 +468,16 @@ impl From<TransactionsWithNewWallets> for ReputationPenalty {
             _ => (
                 PenaltySeverity::None,
                 vec!["Very low % of transactions with new wallets".to_string()],
-            )
-        };  
-        reasoning.push(format!("% Transactions with new wallets: {:?}", transactions_with_new_wallets.0));
-        Self {severity, reasoning}
+            ),
+        };
+        reasoning.push(format!(
+            "% Transactions with new wallets: {:?}",
+            transactions_with_new_wallets.0
+        ));
+        Self {
+            severity,
+            reasoning,
+        }
     }
 }
 
