@@ -376,4 +376,24 @@ mod tests {
         let tx_per_hour = TxPerHour::calculate(&transactions);
         assert_eq!(tx_per_hour.0, 10);
     }
+    #[test]
+    fn test_tx_per_hour_penalties() {
+        let test_cases = vec![
+            (0, PenaltySeverity::High),  // No transactions
+            (3, PenaltySeverity::Low),   // Low volume
+            (15, PenaltySeverity::None), // Good volume
+            (30, PenaltySeverity::High), // Too high volume
+        ];
+
+        for (tx_per_hour, expected_severity) in test_cases {
+            let penalty: ReputationPenalty = TxPerHour(tx_per_hour).into();
+            assert_eq!(
+                std::mem::discriminant(&penalty.severity),
+                std::mem::discriminant(&expected_severity),
+                "TX per hour {} should have {:?} severity",
+                tx_per_hour,
+                expected_severity
+            );
+        }
+    }
 }
