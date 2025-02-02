@@ -45,7 +45,9 @@ fn get_wallet_report(report_id: Uuid) -> Result<WalletReport> {
 }
 
 #[get("/get_wallet_report_creation_count/{wallet_addr}")]
-async fn get_wallet_report_creation_count_endpoint(wallet_addr: web::Path<String>) -> impl Responder {
+async fn get_wallet_report_creation_count_endpoint(
+    wallet_addr: web::Path<String>,
+) -> impl Responder {
     match get_wallet_report_count(wallet_addr.clone()) {
         Ok(count) => HttpResponse::Ok().json(count),
         Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
