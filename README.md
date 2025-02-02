@@ -56,9 +56,11 @@ While this indicator alone does not directly determine a wallet’s reputation, 
 As expected, higher wallet balances are generally associated with greater reputation, as they indicate a stronger financial position and a more vested interest in the network. Conversely, wallets with consistently low balances may be perceived as less reputable, potentially signaling limited engagement, temporary usage, or a lack of substantial investment in the ecosystem. As a result, wallets with very low balances may be penalized in reputation assessments.
 
 ### Transaction Volume
-Regular activity over a long period of time indicates the wallet is legitimate and therefore more reputable. Low transaction volume doesn't inherently impl lower reputation although it's marginally penalized. Wallets with extremely high transaction volume may indicate the wallet is operated by a bot. As such, these wallets are heavily penalized.
+A wallet that demonstrates regular activity over an extended period is generally regarded as legitimate and, therefore, more reputable. Consistent engagement with the network suggests that the wallet is actively managed, reinforcing trust and reliability.
 
-To receive no or a low penalty on this indicator, wallets should maintain a reasonable level of transaction volume over an extended period of time. 
+While low transaction volume does not inherently indicate lower reputation, it is marginally penalized, as infrequent activity may suggest limited participation in the ecosystem. However, the greatest penalties are applied to wallets with extremely high transaction volumes, as such behavior is often associated with automated trading bots or potentially manipulative activity. These wallets may exhibit patterns indicative of wash trading, spam transactions, or other non-organic behavior, raising concerns about their legitimacy.
+
+To avoid penalties under this indicator, a wallet should maintain a reasonable and sustainable level of transaction volume over an extended period. A balanced activity pattern signals genuine participation, helping establish the wallet as a trusted and reputable entity within the Solana network.
 
 ### Dormancy
 Dormancy, or the time elapsed since a wallet's last transaction, serves as a significant indicator of its reputation and activity level. A long period of inactivity suggests that the wallet is not frequently used, which may raise questions about its reliability or relevance within the network. Inactive wallets could belong to long-term holders, lost or abandoned accounts, or entities that engage in sporadic trading rather than active participation.
