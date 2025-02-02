@@ -14,6 +14,11 @@ use SolAnalystAI::{
     worker::worker::WALLET_REPUTATION_TOPIC,
 };
 
+fn get_wallet_report_count(wallet_addr: String) -> Result<i64> {
+    let mut database = Database::connect()?;
+    Ok(database.get_wallet_report_count(wallet_addr))
+}
+
 fn get_wallet_report_creation_date(report_id: Uuid) -> Result<NaiveDateTime> {
     let mut database = Database::connect()?;
     Ok(database.get_wallet_report_creation_date(report_id)?)
@@ -37,6 +42,14 @@ fn get_wallet_report_classification(report_id: Uuid) -> Result<RatingClassificat
 fn get_wallet_report(report_id: Uuid) -> Result<WalletReport> {
     let mut database = Database::connect()?;
     Ok(database.get_wallet_report(report_id)?)
+}
+
+#[get("/get_wallet_report_creation_count/{wallet_addr}")]
+async fn get_wallet_report_creation_count_endpoint(wallet_addr: web::Path<String>) -> impl Responder {
+    match get_wallet_report_count(wallet_addr.clone()) {
+        Ok(count) => HttpResponse::Ok().json(count),
+        Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
+    }
 }
 
 #[get("/get_wallet_report_creation_date/{report_id}")]
@@ -112,6 +125,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_wallet_report_score_endpoint)
             .service(get_wallet_report_case_report_endpoint)
             .service(get_wallet_report_creation_date_endpoint)
+            .service(get_wallet_report_creation_count_endpoint)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
