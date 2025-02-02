@@ -91,4 +91,10 @@ impl Database {
             .execute(&mut self.conn)?;
         Ok(())
     }
+
+    pub fn get_wallet_metrics(&mut self, wallet_report_id: Uuid) -> Result<WalletMetrics> {
+        Ok(wallet_metrics::table
+            .filter(wallet_metrics::wallet_report_id.eq(wallet_report_id))
+            .first(&mut self.conn)?)
+    }
 }
