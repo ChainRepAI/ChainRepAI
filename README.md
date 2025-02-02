@@ -65,10 +65,12 @@ Dormancy, or the time elapsed since a wallet's last transaction, serves as a sig
 Conversely, wallets that maintain regular transaction activity demonstrate ongoing engagement with the network, reinforcing their credibility and trustworthiness. Frequent and consistent usage suggests an actively managed account, reducing uncertainty about its purpose and reliability. As a result, dormancy can be a crucial factor in assessing a wallet’s overall reputation within the Solana ecosystem.
 
 ### Transaction failure rate
-High transaction failure rate may imply lower wallet reputation in several ways:
-- Poor understanding of the network (insufficient gas fees, improper transaction construction)
-- Attempts to front-run or engage in high-frequency activities without proper optimization
-- Interaction with poorly written smart contracts
+A high transaction failure rate can negatively impact a wallet’s reputation, as it may indicate inefficiencies or questionable activity. There are several potential reasons why a wallet experiences frequent transaction failures, each of which can suggest lower reliability:
+
+Lack of network proficiency – A high failure rate may indicate that the wallet owner has a poor understanding of how the Solana network operates. This could manifest through issues such as setting insufficient gas fees, improperly structuring transactions, or failing to account for network congestion.
+Unoptimized high-frequency activity – Frequent failed transactions may be a sign of attempts to engage in front-running or high-frequency trading strategies without the necessary optimization. This could indicate a lack of experience or an overly aggressive trading approach that leads to inefficiencies.
+Interaction with faulty smart contracts – Wallets that regularly engage with poorly written or unverified smart contracts may experience transaction failures due to contract errors. This behavior can suggest risky or experimental activity, reducing confidence in the wallet’s reliability.
+A wallet with a consistently low transaction failure rate, on the other hand, reflects a well-managed account with a solid understanding of the network. This enhances its reputation, signaling competence, reliability, and a structured approach to transaction execution.
 
 ### Prioritization Fee Metrics
 This indicator is based on two key metrics: the average transaction fee and the standard deviation of fees. A lower standard deviation suggests a higher wallet reputation, as it indicates a stable and consistent approach to transaction management. Wallets that maintain steady fee patterns are likely following a well-defined strategy, demonstrating reliability and predictability in their trading behavior.
