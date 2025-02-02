@@ -51,9 +51,9 @@ The absence of severe penalties indicates the wallet operates within reasonable 
 ## Breakdown of the Reputational Indicators
 
 ### Wallet Balance
-Although this indicator doesn't inherently indicate reputation, when combined with others it does illustrate the wallet holder is invested in the Solana ecosystem, especially when the wallet balance is maintained for a long period of time.
+While this indicator alone does not directly determine a wallet’s reputation, it becomes valuable when analyzed alongside other metrics. A wallet that consistently maintains a balance over an extended period signals that the holder is actively invested in the Solana ecosystem. This long-term presence suggests commitment and engagement, reinforcing trust in the wallet’s legitimacy.
 
-As expected, a higher wallet balances are perceived with higher reputation, and as such, very low balances are penalized.
+As expected, higher wallet balances are generally associated with greater reputation, as they indicate a stronger financial position and a more vested interest in the network. Conversely, wallets with consistently low balances may be perceived as less reputable, potentially signaling limited engagement, temporary usage, or a lack of substantial investment in the ecosystem. As a result, wallets with very low balances may be penalized in reputation assessments.
 
 ### Transaction Volume
 Regular activity over a long period of time indicates the wallet is legitimate and therefore more reputable. Low transaction volume doesn't inherently impl lower reputation although it's marginally penalized. Wallets with extremely high transaction volume may indicate the wallet is operated by a bot. As such, these wallets are heavily penalized.
