@@ -1,3 +1,10 @@
+![Static Badge](https://img.shields.io/badge/Built%20With-Rust-green) ![GitHub top language](https://img.shields.io/github/languages/top/SolAnalystAI/SolAnalystAI)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/w/SolAnalystAI/SolAnalystAI) ![GitHub Issues or Pull Requests](https://img.shields.io/github/issues/SolAnalystAI/SolAnalystAI)
+ ![GitHub License](https://img.shields.io/github/license/SolAnalystAI/SolAnalystAI) ![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/SolAnalystAI) 
+
+
+
+
  # SolAnalystAI
 
  ![image](images/banner-header.png)
