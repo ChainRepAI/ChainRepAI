@@ -10,6 +10,35 @@ use crate::{database::models::RatingClassification, wallet::wallet::Wallet};
 
 pub struct TransactionsWithNewWallets (f64);
 
+impl TransactionsWithNewWallets {
+    pub fn calculate(
+        confirmed_transactions: Vec<EncodedConfirmedTransactionWithStatusMeta>,
+    ) -> Self {
+        let total = confirmed_transactions.len();
+
+        // Count transactions that include at least one account that appears to be newly funded.
+        let count_new_wallets: usize = confirmed_transactions.iter().filter(|tx| {
+            if let Some(meta) = &tx.transaction.meta {
+                // Here we assume that meta includes pre_balances and post_balances as vectors of u64.
+                // A new wallet is assumed if any account's pre_balance is 0 and post_balance > 0.
+                meta.pre_balances.iter()
+                    .zip(meta.post_balances.iter())
+                    .any(|(&pre, &post)| pre == 0 && post > 0)
+            } else {
+                false
+            }
+        }).count();
+
+        // Calculate the percentage; if there are no transactions, result defaults to 0.0.
+        let percentage = if total > 0 {
+            (count_new_wallets as f64 / total as f64) * 100.0
+        } else {
+            0.0
+        };
+
+        Self(percentage)
+    }
+}
 
 pub struct WalletBalanceVolatility(f64);
 
