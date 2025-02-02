@@ -87,6 +87,7 @@ pub struct WalletReport {
     pub rating_score: i32,
     pub case_report: serde_json::Value,
     pub report_creation_date: NaiveDateTime,
+    wallet_addr: String,
 }
 
 impl WalletReport {
@@ -95,6 +96,7 @@ impl WalletReport {
         rating_classification: RatingClassification,
         rating_score: i32,
         case_report: CaseReport,
+        wallet_addr: String,
     ) -> Result<Self> {
         Ok(Self {
             id,
@@ -102,6 +104,7 @@ impl WalletReport {
             rating_score,
             case_report: serde_json::to_value(case_report)?,
             report_creation_date: Utc::now().naive_local(),
+            wallet_addr,
         })
     }
 }
