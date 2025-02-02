@@ -77,6 +77,11 @@ High balance volatility and large swings in available capital is often seen as a
 
 Low balance volatility combined with reliable transaction activity and "normal" volume implies very high trust and hence reputation. 
 
+### Percentage of transactions to new wallets
+A high volume of transactions directed toward newly created Solana wallets can indicate low reputation and trustworthiness, as it may suggest artificial or suspicious trading activity. These transactions could be linked to potential wash trading, bot-driven market manipulation, or other forms of fraudulent behavior, making them less reliable indicators of legitimate market participation.
+
+On the other hand, transactions involving well-established wallets—those with a longer history of activity, a substantial Solana balance, and a pattern of consistent, reliable transactions—are generally viewed as more trustworthy. These wallets are often associated with experienced traders, institutional participants, or long-term investors, making them less likely to be involved in deceptive practices. As a result, they tend to inspire greater confidence within the ecosystem and are considered stronger indicators of authentic trading behavior.
+
 ## How to run locally
 1. Clone down the project
     ```console
