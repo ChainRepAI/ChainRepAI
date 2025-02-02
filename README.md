@@ -45,6 +45,11 @@ High transaction failure rate may imply lower wallet reputation in several ways:
 ### Prioritization Fee Metrics
 Two metrics form this indicator: average fee and fee standard deviation. Lower standard deviation implies higher wallet reputation as it reflects higher stability towards transaction management and a consistent strategy. Higher average prioritization fees also imply higher wallet reputation as it can imply the wallet is more confident in their transactions and take active approaches to mitigate front-running attempts.
 
+### Wallet Balance Volatility
+High balance volatility and large swings in available capital is often seen as a red flag as it suggests the owner may not be actively managing their risk exposure. Moreover, it could suggest the user is simply using this wallet as a "hot wallet", only keeping funds there temporarily when required for transactions.
+
+Low balance volatility combined with reliable transaction activity and "normal" volume implies very high trust and hence reputation. 
+
 ## Example Generated Report: @frankdegods
 <img src="images/frank.png" width="300">
 
