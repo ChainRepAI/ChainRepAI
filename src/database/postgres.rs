@@ -1,7 +1,8 @@
 use anyhow::Result;
 use chrono::NaiveDateTime;
 use diesel::{
-    dsl::insert_into, Connection, ExpressionMethods, PgConnection, QueryDsl, RunQueryDsl,
+    dsl::insert_into, Connection, ExpressionMethods, OptionalExtension, PgConnection, QueryDsl,
+    RunQueryDsl,
 };
 use serde_json::from_value;
 use uuid::Uuid;
@@ -9,8 +10,8 @@ use uuid::Uuid;
 use crate::case_report::case_report::CaseReport;
 
 use super::{
-    models::{RatingClassification, WalletMetrics, WalletReport},
-    schema::{wallet_metrics, wallet_report},
+    models::{RatingClassification, User, WalletMetrics, WalletReport},
+    schema::{users, wallet_metrics, wallet_report},
 };
 
 pub struct Database {
@@ -96,5 +97,12 @@ impl Database {
         Ok(wallet_metrics::table
             .filter(wallet_metrics::wallet_report_id.eq(wallet_report_id))
             .first(&mut self.conn)?)
+    }
+
+    pub fn insert_user(&mut self, user: User) -> Result<()> {
+        insert_into(users::table)
+            .values(user)
+            .execute(&mut self.conn)?;
+        Ok(())
     }
 }
