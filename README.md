@@ -52,6 +52,7 @@ Although the overall rating is AAA, the recent activity pattern may present a ri
 | GET         | `/get_wallet_report_creation_count/{wallet_addr}` | Get the number of wallet reports created for a specific wallet address.    |
 | GET         | `/get_wallet_report_metrics/{report_id}`   | Get the calculated reputational metrics from a wallet report.               |
 | GET         | `/health`                                  | Health Check.                                                               |
+| POST         | `/create_user`                            | Creates a new user and returns the new associated api key.                                                               |
 
 ## Breakdown of the Reputational Indicators
 
