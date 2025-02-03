@@ -20,3 +20,4 @@ uuid = { version = "1.11.0", features = ["serde", "v4", "fast-rng"] }
 pulsar = "6.3.0"
 futures = "0.3.31"
 rayon = "1.10.0"
+rand = "0.9.0"
