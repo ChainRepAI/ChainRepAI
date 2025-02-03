@@ -121,3 +121,12 @@ pub struct WalletMetrics {
     pub tx_per_hour: i64,
     pub wallet_balance: i64,
 }
+
+#[derive(Insertable, Queryable, Debug, Serialize, Clone)]
+#[diesel(table_name = crate::database::schema::users)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct User {
+    pub id: Uuid,
+    pub api_key: String,
+    pub created_at: NaiveDateTime,
+}
