@@ -7,10 +7,14 @@ use diesel::expression::AsExpression;
 use diesel::pg::{Pg, PgValue};
 use diesel::prelude::{Insertable, Queryable};
 use diesel::serialize::{self, IsNull, Output, ToSql};
+use rand::distr::Alphanumeric;
+use rand::{rng, Rng};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::case_report::case_report::CaseReport;
+
+const API_KEY_LENGTH: usize = 20;
 
 #[derive(Debug, AsExpression, FromSqlRow, Serialize, Deserialize, PartialEq, Clone)]
 #[diesel(sql_type = crate::database::schema::sql_types::RatingClassification)]
@@ -129,4 +133,21 @@ pub struct User {
     pub id: Uuid,
     pub api_key: String,
     pub created_at: NaiveDateTime,
+}
+
+impl User {
+    pub fn new() -> Self {
+        let rng = rng();
+        let api_key: String = rng
+            .sample_iter(&Alphanumeric)
+            .take(API_KEY_LENGTH)
+            .map(char::from)
+            .collect();
+
+        Self {
+            id: Uuid::new_v4(),
+            api_key,
+            created_at: Utc::now().naive_local(),
+        }
+    }
 }
