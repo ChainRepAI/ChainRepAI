@@ -6,13 +6,21 @@ use uuid::Uuid;
 use SolAnalystAI::{
     case_report::case_report::CaseReport,
     database::{
-        models::{RatingClassification, WalletMetrics, WalletReport},
+        models::{RatingClassification, User, WalletMetrics, WalletReport},
         postgres::Database,
     },
     jobs::jobs::WalletReportJob,
     pulsar::pulsar::PulsarClient,
     worker::worker::WALLET_REPUTATION_TOPIC,
 };
+
+fn create_user() -> Result<String> {
+    let mut database = Database::connect()?;
+    let user = User::new();
+    let api_key = user.api_key.clone();
+    database.insert_user(user)?;
+    Ok(api_key)
+}
 
 fn get_wallet_report_metrics(report_id: Uuid) -> Result<WalletMetrics> {
     let mut database = Database::connect()?;
@@ -53,6 +61,15 @@ fn get_wallet_report(report_id: Uuid) -> Result<WalletReport> {
 async fn get_wallet_report_metrics_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
     match get_wallet_report_metrics(*report_id) {
         Ok(wallet_metrics) => HttpResponse::Ok().json(wallet_metrics),
+        Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
+    }
+}
+
+#[post("/create_user")]
+async fn create_user_endpoint(
+) -> impl Responder {
+    match create_user() {
+        Ok(api_key) => HttpResponse::Ok().json(api_key),
         Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
     }
 }
@@ -142,6 +159,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_wallet_report_creation_date_endpoint)
             .service(get_wallet_report_creation_count_endpoint)
             .service(get_wallet_report_metrics_endpoint)
+            .service(create_user_endpoint)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
