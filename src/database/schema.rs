@@ -32,4 +32,12 @@ diesel::table! {
     }
 }
 
+diesel::table! {
+    users (id) {
+        id -> Uuid,
+        api_key -> Text,
+        created_at -> Timestamp,
+    }
+}
+
 diesel::allow_tables_to_appear_in_same_query!(wallet_metrics, wallet_report,);
