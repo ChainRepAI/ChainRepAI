@@ -15,8 +15,7 @@ This project is, and always will be, Open-Source.
 [Website](https://solanalystai.com/)
 <br>
 [Twitter](https://x.com/SolAnalystAI)
-<br>
-[YouTube](https://www.youtube.com/@SolAnalystAI)
+
 
 ## Example Generated Report: @frankdegods
 <img src="images/frank.png" width="300">
