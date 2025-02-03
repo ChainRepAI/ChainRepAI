@@ -105,4 +105,13 @@ impl Database {
             .execute(&mut self.conn)?;
         Ok(())
     }
+
+    pub fn check_user_exists(&mut self, api_key: &str) -> Result<bool> {
+        let user = users::table
+            .filter(users::api_key.eq(api_key.to_string()))
+            .select(users::all_columns)
+            .first::<User>(&mut self.conn)
+            .optional()?;
+        Ok(user.is_some())
+    }
 }
