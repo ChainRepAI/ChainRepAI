@@ -166,7 +166,7 @@ async fn start_wallet_report_endpoint(wallet_addr: web::Path<String>) -> impl Re
 
     match pulsar_producer.enqueue_job(job).await {
         Ok(_) => HttpResponse::Ok().json(id),
-        Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
+        Err(_) => HttpResponse::InternalServerError().json("Unable to start wallet report"),
     }
 }
 
