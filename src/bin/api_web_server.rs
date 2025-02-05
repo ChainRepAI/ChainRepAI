@@ -87,7 +87,7 @@ async fn delete_wallet_report_endpoint(report_id: web::Path<Uuid>) -> impl Respo
 async fn get_wallet_report_metrics_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
     match get_wallet_report_metrics(*report_id) {
         Ok(wallet_metrics) => HttpResponse::Ok().json(wallet_metrics),
-        Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
+        Err(_) => HttpResponse::InternalServerError().json("No wallet report metrics exists for supplied id"),
     }
 }
 
