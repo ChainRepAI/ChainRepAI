@@ -1,8 +1,8 @@
 use anyhow::Result;
 use chrono::NaiveDateTime;
 use diesel::{
-    dsl::insert_into, Connection, ExpressionMethods, OptionalExtension, PgConnection, QueryDsl,
-    RunQueryDsl,
+    delete, dsl::insert_into, Connection, ExpressionMethods, OptionalExtension, PgConnection,
+    QueryDsl, RunQueryDsl,
 };
 use serde_json::from_value;
 use uuid::Uuid;
@@ -113,5 +113,21 @@ impl Database {
             .first::<User>(&mut self.conn)
             .optional()?;
         Ok(user.is_some())
+    }
+
+    pub fn delete_report(&mut self, wallet_report_id: Uuid) -> Result<()> {
+        self.conn
+            .transaction::<_, diesel::result::Error, _>(|conn| {
+                delete(wallet_metrics::table)
+                    .filter(wallet_metrics::wallet_report_id.eq(wallet_report_id))
+                    .execute(conn)?;
+
+                delete(wallet_report::table)
+                    .filter(wallet_report::id.eq(wallet_report_id))
+                    .execute(conn)?;
+
+                Ok(())
+            })?;
+        Ok(())
     }
 }
