@@ -1,10 +1,10 @@
 use anyhow::Result;
+use log::{error, info};
 use pulsar::{
     consumer::{DeadLetterPolicy, Message},
     producer, proto, Consumer, Producer, Pulsar, SubType, TokioExecutor,
 };
-use uuid::Uuid;
-use log::{info, error}; // Import logging macros
+use uuid::Uuid; // Import logging macros
 
 use crate::jobs::jobs::WalletReportJob;
 
@@ -22,7 +22,10 @@ impl PulsarClient {
             .build()
             .await
             .expect("Should be able to create new pulsar client builder");
-        info!("Pulsar client created successfully with address: {}", PULSAR_ADDR);
+        info!(
+            "Pulsar client created successfully with address: {}",
+            PULSAR_ADDR
+        );
         Self {
             internal_client: client,
         }
@@ -43,10 +46,10 @@ impl PulsarClient {
                         r#type: proto::schema::Type::String as i32,
                         ..Default::default()
                     }),
-                ..Default::default()
-            })
-            .build()
-            .await
+                    ..Default::default()
+                })
+                .build()
+                .await
                 .expect("Should be able to create producer"),
         }
     }
@@ -99,20 +102,44 @@ pub struct PulsarConsumer {
 
 impl PulsarConsumer {
     pub async fn ack(&mut self, msg: &Message<WalletReportJob>) {
-        info!("Acknowledging message with id: {:?} on consumer: {}", msg.message_id(), self.id);
+        info!(
+            "Acknowledging message with id: {:?} on consumer: {}",
+            msg.message_id(),
+            self.id
+        );
         if let Err(e) = self.internal_consumer.ack(msg).await {
-            error!("Failed to ack message with id: {:?} on consumer {}: {:?}", msg.message_id(), self.id, e);
+            error!(
+                "Failed to ack message with id: {:?} on consumer {}: {:?}",
+                msg.message_id(),
+                self.id,
+                e
+            );
         } else {
-            info!("Message with id: {:?} acknowledged successfully", msg.message_id());
+            info!(
+                "Message with id: {:?} acknowledged successfully",
+                msg.message_id()
+            );
         }
     }
 
     pub async fn nack(&mut self, msg: &Message<WalletReportJob>) {
-        info!("Nacking message with id: {:?} on consumer: {}", msg.message_id(), self.id);
+        info!(
+            "Nacking message with id: {:?} on consumer: {}",
+            msg.message_id(),
+            self.id
+        );
         if let Err(e) = self.internal_consumer.nack(msg).await {
-            error!("Failed to nack message with id: {:?} on consumer {}: {:?}", msg.message_id(), self.id, e);
+            error!(
+                "Failed to nack message with id: {:?} on consumer {}: {:?}",
+                msg.message_id(),
+                self.id,
+                e
+            );
         } else {
-            info!("Message with id: {:?} nacked successfully", msg.message_id());
+            info!(
+                "Message with id: {:?} nacked successfully",
+                msg.message_id()
+            );
         }
     }
 }

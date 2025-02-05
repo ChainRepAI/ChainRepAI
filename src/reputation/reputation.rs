@@ -222,7 +222,10 @@ impl Reputation {
     }
 
     pub fn new_from_wallet(wallet: &Wallet, id: Uuid) -> Self {
-        log::info!("Initializing reputation creation for wallet with report id: {}", id);
+        log::info!(
+            "Initializing reputation creation for wallet with report id: {}",
+            id
+        );
 
         // calculate metrics/indicators
         let tx_per_hour = TxPerHour::calculate(&wallet.transaction_history);
@@ -236,13 +239,23 @@ impl Reputation {
                 log::warn!("Days since last block calculation failed, using default max value");
                 DaysSinceLastBlock(std::u64::MAX)
             });
-        log::debug!("Computed days since last block: {:?}", days_since_last_block);
+        log::debug!(
+            "Computed days since last block: {:?}",
+            days_since_last_block
+        );
 
-        let transaction_failure_rate = TransactionFailureRate::calculate(&wallet.transaction_history);
-        log::debug!("Computed transaction failure rate: {:?}", transaction_failure_rate);
+        let transaction_failure_rate =
+            TransactionFailureRate::calculate(&wallet.transaction_history);
+        log::debug!(
+            "Computed transaction failure rate: {:?}",
+            transaction_failure_rate
+        );
 
         let prio_fee_metrics = PrioritizationFeesMetrics::calculate(&wallet.prioritization_fees);
-        log::debug!("Computed prioritization fees metrics: {:?}", prio_fee_metrics);
+        log::debug!(
+            "Computed prioritization fees metrics: {:?}",
+            prio_fee_metrics
+        );
 
         let mut penalties: Vec<ReputationPenalty> = vec![];
         // add penalties

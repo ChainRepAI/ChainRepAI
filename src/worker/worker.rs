@@ -61,7 +61,10 @@ impl WalletReportWorker {
                 }
                 Err(e) => {
                     self.job_consumer.nack(&msg).await;
-                    warn!("Job processing failed with error: {:?}. Message negatively acknowledged.", e);
+                    warn!(
+                        "Job processing failed with error: {:?}. Message negatively acknowledged.",
+                        e
+                    );
                 }
             }
         }
