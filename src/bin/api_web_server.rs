@@ -66,7 +66,7 @@ fn get_wallet_report(report_id: Uuid) -> Result<WalletReport> {
 async fn delete_wallet_report_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
     match delete_report(*report_id) {
         Ok(_) => HttpResponse::Ok().json("Successfully deleted wallet report"),
-        Err(_) => HttpResponse::NotFound().json("Report with supplied doesn't exist"),
+        Err(_) => HttpResponse::NotFound().json("Report with supplied id doesn't exist"),
     }
 }
 
