@@ -4,6 +4,7 @@ use diesel::{
     delete, dsl::insert_into, Connection, ExpressionMethods, OptionalExtension, PgConnection,
     QueryDsl, RunQueryDsl,
 };
+use log::{error, info};
 use serde_json::from_value;
 use uuid::Uuid;
 
@@ -21,120 +22,156 @@ pub struct Database {
 impl Database {
     pub fn connect() -> Result<Self> {
         let database_url = std::env::var("DATABASE_URL")?;
+        info!("Attempting to establish a connection to the database at {}", database_url);
         let conn = PgConnection::establish(&database_url)?;
+        info!("Successfully connected to the database");
         Ok(Self { conn })
     }
 
     pub fn insert_wallet_report(&mut self, wallet_report: WalletReport) -> Result<()> {
         insert_into(wallet_report::table)
-            .values(wallet_report)
+            .values(&wallet_report)
             .execute(&mut self.conn)?;
         Ok(())
     }
 
     pub fn get_wallet_report(&mut self, wallet_report_id: Uuid) -> Result<WalletReport> {
-        Ok(wallet_report::table
+        info!("Fetching wallet report with id: {}", wallet_report_id);
+        let report = wallet_report::table
             .filter(wallet_report::id.eq(wallet_report_id))
             .select(wallet_report::all_columns)
-            .first::<WalletReport>(&mut self.conn)?)
+            .first::<WalletReport>(&mut self.conn)?;
+        info!("Successfully fetched wallet report with id: {}", wallet_report_id);
+        Ok(report)
     }
 
     pub fn get_wallet_report_classification(
         &mut self,
         wallet_report_id: Uuid,
     ) -> Result<RatingClassification> {
-        Ok(wallet_report::table
+        info!("Fetching rating classification for wallet report id: {}", wallet_report_id);
+        let classification = wallet_report::table
             .filter(wallet_report::id.eq(wallet_report_id))
             .select(wallet_report::all_columns)
             .first::<WalletReport>(&mut self.conn)?
-            .rating_classification)
+            .rating_classification;
+        info!("Successfully fetched rating classification for wallet report id: {}", wallet_report_id);
+        Ok(classification)
     }
 
     pub fn get_wallet_report_score(&mut self, wallet_report_id: Uuid) -> Result<i32> {
-        Ok(wallet_report::table
+        info!("Fetching rating score for wallet report id: {}", wallet_report_id);
+        let score = wallet_report::table
             .filter(wallet_report::id.eq(wallet_report_id))
             .select(wallet_report::all_columns)
             .first::<WalletReport>(&mut self.conn)?
-            .rating_score)
+            .rating_score;
+        info!("Successfully fetched rating score for wallet report id: {}", wallet_report_id);
+        Ok(score)
     }
 
     pub fn get_wallet_report_case_report(&mut self, wallet_report_id: Uuid) -> Result<CaseReport> {
-        let case_report = wallet_report::table
+        info!("Fetching case report for wallet report id: {}", wallet_report_id);
+        let case_report_value = wallet_report::table
             .filter(wallet_report::id.eq(wallet_report_id))
             .select(wallet_report::all_columns)
             .first::<WalletReport>(&mut self.conn)?
             .case_report;
-        Ok(from_value(case_report)?)
+        let case_report: CaseReport = from_value(case_report_value)?;
+        info!("Successfully fetched case report for wallet report id: {}", wallet_report_id);
+        Ok(case_report)
     }
 
     pub fn get_wallet_report_creation_date(
         &mut self,
         wallet_report_id: Uuid,
     ) -> Result<NaiveDateTime> {
-        Ok(wallet_report::table
+        info!("Fetching creation date for wallet report id: {}", wallet_report_id);
+        let creation_date = wallet_report::table
             .filter(wallet_report::id.eq(wallet_report_id))
             .select(wallet_report::all_columns)
             .first::<WalletReport>(&mut self.conn)?
-            .report_creation_date)
+            .report_creation_date;
+        info!("Successfully fetched creation date for wallet report id: {}", wallet_report_id);
+        Ok(creation_date)
     }
 
     pub fn get_wallet_report_count(&mut self, wallet_addr: String) -> i64 {
-        wallet_report::table
-            .filter(wallet_report::wallet_addr.eq(wallet_addr))
+        info!("Counting wallet reports for wallet_addr: {}", wallet_addr);
+        let count = wallet_report::table
+            .filter(wallet_report::wallet_addr.eq(wallet_addr.clone()))
             .count()
             .get_result::<i64>(&mut self.conn)
-            .unwrap_or_else(|_| 0)
+            .unwrap_or_else(|e| {
+                error!("Failed to count wallet reports for address {}: {}", wallet_addr, e);
+                0
+            });
+        info!("Wallet report count for {}: {}", wallet_addr, count);
+        count
     }
 
     pub fn insert_wallet_metrics(&mut self, wallet_metrics: WalletMetrics) -> Result<()> {
+        info!("Inserting wallet metrics for wallet_report_id: {}", wallet_metrics.wallet_report_id);
         insert_into(wallet_metrics::table)
-            .values(wallet_metrics)
+            .values(&wallet_metrics)
             .execute(&mut self.conn)?;
+        info!("Successfully inserted wallet metrics for wallet_report_id: {}", wallet_metrics.wallet_report_id);
         Ok(())
     }
 
     pub fn get_wallet_metrics(&mut self, wallet_report_id: Uuid) -> Result<WalletMetrics> {
-        Ok(wallet_metrics::table
+        info!("Fetching wallet metrics for wallet_report_id: {}", wallet_report_id);
+        let metrics = wallet_metrics::table
             .filter(wallet_metrics::wallet_report_id.eq(wallet_report_id))
-            .first(&mut self.conn)?)
+            .first(&mut self.conn)?;
+        info!("Successfully fetched wallet metrics for wallet_report_id: {}", wallet_report_id);
+        Ok(metrics)
     }
 
     pub fn insert_user(&mut self, user: User) -> Result<()> {
+        info!("Inserting user with api_key: {}", user.api_key);
         insert_into(users::table)
-            .values(user)
+            .values(&user)
             .execute(&mut self.conn)?;
+        info!("Successfully inserted user with api_key: {}", user.api_key);
         Ok(())
     }
 
     pub fn check_user_exists(&mut self, api_key: &str) -> Result<bool> {
+        info!("Checking existence of user with api_key: {}", api_key);
         let user = users::table
             .filter(users::api_key.eq(api_key.to_string()))
             .select(users::all_columns)
             .first::<User>(&mut self.conn)
             .optional()?;
-        Ok(user.is_some())
+        let exists = user.is_some();
+        info!("User with api_key: {} exists: {}", api_key, exists);
+        Ok(exists)
     }
 
     pub fn delete_report(&mut self, wallet_report_id: Uuid) -> Result<()> {
+        info!("Deleting report for wallet_report_id: {}", wallet_report_id);
         self.conn
             .transaction::<_, diesel::result::Error, _>(|conn| {
                 delete(wallet_metrics::table)
                     .filter(wallet_metrics::wallet_report_id.eq(wallet_report_id))
                     .execute(conn)?;
 
-                delete(wallet_report::table)
+                    delete(wallet_report::table)
                     .filter(wallet_report::id.eq(wallet_report_id))
                     .execute(conn)?;
-
                 Ok(())
             })?;
+        info!("Successfully deleted report and associated metrics for wallet_report_id: {}", wallet_report_id);
         Ok(())
     }
 
     pub fn delete_user(&mut self, api_key: &str) -> Result<()> {
+        info!("Deleting user with api_key: {}", api_key);
         delete(users::table)
             .filter(users::api_key.eq(api_key))
             .execute(&mut self.conn)?;
+        info!("Successfully deleted user with api_key: {}", api_key);
         Ok(())
     }
 }
