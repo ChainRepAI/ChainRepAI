@@ -93,8 +93,10 @@ impl WalletBalanceVolatility {
     }
 }
 
+#[derive(Debug)]
 pub struct WalletBalance(u64);
 
+#[derive(Debug)]
 pub struct TxPerHour(i64);
 
 impl TxPerHour {
@@ -116,6 +118,7 @@ impl TxPerHour {
     }
 }
 
+#[derive(Debug)]
 pub struct DaysSinceLastBlock(u64);
 
 impl DaysSinceLastBlock {
@@ -137,6 +140,7 @@ impl DaysSinceLastBlock {
     }
 }
 
+#[derive(Debug)]
 pub struct PrioritizationFeesMetrics {
     avg_fee: f64,
     std_deviation: f64,
@@ -168,6 +172,7 @@ impl PrioritizationFeesMetrics {
     }
 }
 
+#[derive(Debug)]
 pub struct TransactionFailureRate(f64);
 
 impl TransactionFailureRate {
@@ -263,7 +268,7 @@ pub enum PenaltySeverity {
     None,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Debug)]
 pub struct ReputationPenalty {
     severity: PenaltySeverity,
     reasoning: Vec<String>,
