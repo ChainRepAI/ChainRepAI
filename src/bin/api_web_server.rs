@@ -1,4 +1,4 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder};
+use actix_web::{delete, get, post, web, App, HttpResponse, HttpServer, Responder};
 use anyhow::Result;
 use chrono::NaiveDateTime;
 use dotenv::dotenv;
@@ -13,6 +13,11 @@ use SolAnalystAI::{
     pulsar::pulsar::PulsarClient,
     worker::worker::WALLET_REPUTATION_TOPIC,
 };
+
+fn delete_report(wallet_report_id: Uuid) -> Result<()> {
+    let mut database = Database::connect()?;
+    database.delete_report(wallet_report_id)
+}
 
 fn create_user() -> Result<String> {
     let mut database = Database::connect()?;
@@ -57,6 +62,14 @@ fn get_wallet_report(report_id: Uuid) -> Result<WalletReport> {
     Ok(database.get_wallet_report(report_id)?)
 }
 
+#[delete("/delete_wallet_report/{report_id}")]
+async fn delete_wallet_report_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
+    match delete_report(*report_id) {
+        Ok(_) => HttpResponse::Ok().json("Successfully deleted wallet report"),
+        Err(_) => HttpResponse::NotFound().json("Report with supplied doesn't exist"),
+    }
+}
+
 #[get("/get_wallet_report_metrics/{report_id}")]
 async fn get_wallet_report_metrics_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
     match get_wallet_report_metrics(*report_id) {
@@ -66,8 +79,7 @@ async fn get_wallet_report_metrics_endpoint(report_id: web::Path<Uuid>) -> impl 
 }
 
 #[post("/create_user")]
-async fn create_user_endpoint(
-) -> impl Responder {
+async fn create_user_endpoint() -> impl Responder {
     match create_user() {
         Ok(api_key) => HttpResponse::Ok().json(api_key),
         Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
@@ -160,6 +172,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_wallet_report_creation_count_endpoint)
             .service(get_wallet_report_metrics_endpoint)
             .service(create_user_endpoint)
+            .service(delete_wallet_report_endpoint)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
