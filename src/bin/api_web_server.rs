@@ -95,7 +95,7 @@ async fn get_wallet_report_metrics_endpoint(report_id: web::Path<Uuid>) -> impl 
 async fn create_user_endpoint() -> impl Responder {
     match create_user() {
         Ok(api_key) => HttpResponse::Ok().json(api_key),
-        Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
+        Err(_) => HttpResponse::InternalServerError().json("Unable to create user"),
     }
 }
 
