@@ -54,6 +54,8 @@ Although the overall rating is AAA, the recent activity pattern may present a ri
 | GET         | `/health`                                  | Health Check.                                                               |
 | POST         | `/create_user`                            | Creates a new user and returns the new associated api key.                                                           |
 | DELETE         | `/delete_wallet_report/{report_id}`     | Deletes the wallet report.    
+| DELETE         | `/delete_user/{api_key}`                | Deletes the wallet report.    
+
 ## Breakdown of the Reputational Indicators
 
 ### Wallet Balance
