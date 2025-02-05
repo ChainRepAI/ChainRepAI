@@ -121,7 +121,7 @@ async fn get_wallet_report_creation_date_endpoint(report_id: web::Path<Uuid>) ->
 async fn get_wallet_report_case_report_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
     match get_wallet_report_case_report(*report_id) {
         Ok(case_report) => HttpResponse::Ok().json(case_report),
-        Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
+        Err(_) => HttpResponse::InternalServerError().json("No wallet report exists for supplied id"),
     }
 }
 
@@ -129,7 +129,7 @@ async fn get_wallet_report_case_report_endpoint(report_id: web::Path<Uuid>) -> i
 async fn get_wallet_report_score_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
     match get_wallet_report_score(*report_id) {
         Ok(score) => HttpResponse::Ok().json(score),
-        Err(_) => HttpResponse::InternalServerError().json("No wallet report exists with supplied id"),
+        Err(_) => HttpResponse::InternalServerError().json("No wallet report exists for supplied id"),
     }
 }
 
@@ -137,7 +137,7 @@ async fn get_wallet_report_score_endpoint(report_id: web::Path<Uuid>) -> impl Re
 async fn get_wallet_report_classification_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
     match get_wallet_report_classification(*report_id) {
         Ok(classification) => HttpResponse::Ok().json(classification),
-        Err(_) => HttpResponse::InternalServerError().json("No wallet report exists with supplied id"),
+        Err(_) => HttpResponse::InternalServerError().json("No wallet report exists for supplied id"),
     }
 }
 
@@ -145,7 +145,7 @@ async fn get_wallet_report_classification_endpoint(report_id: web::Path<Uuid>) -
 async fn get_wallet_report_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
     match get_wallet_report(*report_id) {
         Ok(wallet_report) => HttpResponse::Ok().json(wallet_report),
-        Err(_) => HttpResponse::NotFound().json("No wallet report exists with supplied id"),
+        Err(_) => HttpResponse::NotFound().json("No wallet report exists for supplied id"),
     }
 }
 
