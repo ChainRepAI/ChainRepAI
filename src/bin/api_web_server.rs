@@ -129,7 +129,7 @@ async fn get_wallet_report_case_report_endpoint(report_id: web::Path<Uuid>) -> i
 async fn get_wallet_report_score_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
     match get_wallet_report_score(*report_id) {
         Ok(score) => HttpResponse::Ok().json(score),
-        Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
+        Err(_) => HttpResponse::InternalServerError().json("No wallet report exists with supplied id"),
     }
 }
 
