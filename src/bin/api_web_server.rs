@@ -113,7 +113,7 @@ async fn get_wallet_report_creation_count_endpoint(
 async fn get_wallet_report_creation_date_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
     match get_wallet_report_creation_date(*report_id) {
         Ok(creation_date) => HttpResponse::Ok().json(creation_date),
-        Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
+        Err(_) => HttpResponse::InternalServerError().json("No wallet report exists for supplied id"),
     }
 }
 
