@@ -222,14 +222,27 @@ impl Reputation {
     }
 
     pub fn new_from_wallet(wallet: &Wallet, id: Uuid) -> Self {
+        log::info!("Initializing reputation creation for wallet with report id: {}", id);
+
         // calculate metrics/indicators
         let tx_per_hour = TxPerHour::calculate(&wallet.transaction_history);
+        log::debug!("Computed transactions per hour: {:?}", tx_per_hour);
+
         let wallet_balance = WalletBalance(wallet.account_balance);
+        log::debug!("Computed wallet balance: {:?}", wallet_balance);
+
         let days_since_last_block = DaysSinceLastBlock::calculate(&wallet.transaction_history)
-            .unwrap_or_else(|| DaysSinceLastBlock(std::u64::MAX));
-        let transaction_failure_rate =
-            TransactionFailureRate::calculate(&wallet.transaction_history);
+            .unwrap_or_else(|| {
+                log::warn!("Days since last block calculation failed, using default max value");
+                DaysSinceLastBlock(std::u64::MAX)
+            });
+        log::debug!("Computed days since last block: {:?}", days_since_last_block);
+
+        let transaction_failure_rate = TransactionFailureRate::calculate(&wallet.transaction_history);
+        log::debug!("Computed transaction failure rate: {:?}", transaction_failure_rate);
+
         let prio_fee_metrics = PrioritizationFeesMetrics::calculate(&wallet.prioritization_fees);
+        log::debug!("Computed prioritization fees metrics: {:?}", prio_fee_metrics);
 
         let mut penalties: Vec<ReputationPenalty> = vec![];
         // add penalties
@@ -240,7 +253,9 @@ impl Reputation {
         let (fee_penalty_1, fee_penalty_2) = (&prio_fee_metrics).into();
         penalties.extend([fee_penalty_1, fee_penalty_2]);
 
+        log::info!("Penalties calculated: {:?}", penalties);
         let rating_score = Self::calc_rating_score(&penalties);
+        log::info!("Calculated rating score: {:?}", rating_score);
 
         Self {
             id,
