@@ -2,6 +2,7 @@ use anyhow::Result;
 use pulsar::{producer, DeserializeMessage, Error as PulsarError, SerializeMessage};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
+use log::info;
 
 use crate::{
     case_report::case_report::CaseReport, database::models::WalletReport,
@@ -34,9 +35,20 @@ impl DeserializeMessage for WalletReportJob {
 
 impl WalletReportJob {
     pub async fn do_job(&self, worker: &mut WalletReportWorker) -> Result<()> {
+        info!("Starting WalletReportJob for wallet address: {} and report_id: {}", self.wallet_addr, self.report_id);
+
         let wallet = Wallet::new(self.wallet_addr.as_str(), &worker.solana_client).await;
+        info!("Wallet retrieved: {:?}", wallet);
+
         let reputation = Reputation::new_from_wallet(&wallet, self.report_id.clone());
+        info!("Computed reputation for report_id {}: rating_classification = {:?}, rating_score = {}",
+              self.report_id, reputation.rating_classification, reputation.rating_score);
+
+        // Generate case report
         let case_report = CaseReport::new(&worker.openai_client, &reputation, wallet).await?;
+        info!("Generated case report for wallet: {}", self.wallet_addr);
+
+        // Create wallet report
         let wallet_report = WalletReport::new(
             self.report_id,
             reputation.rating_classification,
@@ -44,10 +56,17 @@ impl WalletReportJob {
             case_report,
             self.wallet_addr.clone(),
         )?;
+        info!("Wallet report created, proceeding to database insertion");
+
+        // Insert wallet report into database
         worker.database.insert_wallet_report(wallet_report)?;
-        worker
-            .database
-            .insert_wallet_metrics(reputation.wallet_metrics)?;
+        info!("Wallet report inserted successfully for report_id {}", self.report_id);
+
+        // Insert wallet metrics into database
+        worker.database.insert_wallet_metrics(reputation.wallet_metrics)?;
+        info!("Wallet metrics inserted successfully for wallet: {}", self.wallet_addr);
+
+        info!("Finished WalletReportJob for wallet address: {}", self.wallet_addr);
         Ok(())
     }
 }

@@ -5,6 +5,7 @@ use solana_sdk::{account::Account, pubkey::Pubkey};
 
 use crate::solana_client::solana_client::SolanaClient;
 
+#[derive(Debug)]
 pub struct Wallet {
     pub account_balance: u64,
     pub account_info: Account,
