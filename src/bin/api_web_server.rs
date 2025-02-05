@@ -137,7 +137,7 @@ async fn get_wallet_report_score_endpoint(report_id: web::Path<Uuid>) -> impl Re
 async fn get_wallet_report_classification_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
     match get_wallet_report_classification(*report_id) {
         Ok(classification) => HttpResponse::Ok().json(classification),
-        Err(_) => HttpResponse::InternalServerError().json("Internal Server Error"),
+        Err(_) => HttpResponse::InternalServerError().json("No wallet report exists with supplied id"),
     }
 }
 
@@ -145,7 +145,7 @@ async fn get_wallet_report_classification_endpoint(report_id: web::Path<Uuid>) -
 async fn get_wallet_report_endpoint(report_id: web::Path<Uuid>) -> impl Responder {
     match get_wallet_report(*report_id) {
         Ok(wallet_report) => HttpResponse::Ok().json(wallet_report),
-        Err(_) => HttpResponse::NotFound().json("Not wallet report exists with supplied id"),
+        Err(_) => HttpResponse::NotFound().json("No wallet report exists with supplied id"),
     }
 }
 
