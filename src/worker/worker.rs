@@ -1,5 +1,6 @@
 use anyhow::Result;
 use futures::TryStreamExt;
+use log::{error, info, warn};
 use pulsar::SubType;
 
 use crate::{
@@ -22,6 +23,7 @@ pub struct WalletReportWorker {
 
 impl WalletReportWorker {
     pub async fn new() -> Self {
+        info!("Initializing WalletReportWorker...");
         let pulsar_client = PulsarClient::new().await;
         Self {
             database: Database::connect().expect("Should be able to connect to db"),
@@ -34,6 +36,7 @@ impl WalletReportWorker {
     }
 
     pub async fn do_work(&mut self) -> Result<()> {
+        info!("Worker started processing jobs.");
         while let Some(msg) = self
             .job_consumer
             .internal_consumer
@@ -41,26 +44,29 @@ impl WalletReportWorker {
             .await
             .expect("Should be able to wait for new message.")
         {
+            // Attempt to deserialize the incoming job message.
             let wallet_reputation_job = match msg.deserialize() {
                 Ok(data) => data,
                 Err(e) => {
-                    println!("Couldn't deseralize job, error: {:?}.", e);
+                    error!("Couldn't deserialize job, error: {:?}", e);
                     continue;
                 }
             };
 
+            // Process the job and acknowledge or negatively acknowledge accordingly.
             match wallet_reputation_job.do_job(self).await {
                 Ok(_) => {
                     self.job_consumer.ack(&msg).await;
-                    println!("Job processed successfully");
+                    info!("Job processed successfully");
                 }
-                Err(_) => {
+                Err(e) => {
                     self.job_consumer.nack(&msg).await;
-                    println!("Couldn't process job successfully");
+                    warn!("Job processing failed with error: {:?}. Message negatively acknowledged.", e);
                 }
             }
         }
 
+        info!("No more messages to process. Exiting worker loop.");
         Ok(())
     }
 }
