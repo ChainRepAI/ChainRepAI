@@ -130,4 +130,11 @@ impl Database {
             })?;
         Ok(())
     }
+
+    pub fn delete_user(&mut self, api_key: &str) -> Result<()> {
+        delete(users::table)
+            .filter(users::api_key.eq(api_key))
+            .execute(&mut self.conn)?;
+        Ok(())
+    }
 }
