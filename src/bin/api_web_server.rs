@@ -14,6 +14,11 @@ use SolAnalystAI::{
     worker::worker::WALLET_REPUTATION_TOPIC,
 };
 
+fn delete_user(api_key: &str) -> Result<()> {
+    let mut database = Database::connect()?;
+    database.delete_user(api_key)
+}
+
 fn delete_report(wallet_report_id: Uuid) -> Result<()> {
     let mut database = Database::connect()?;
     database.delete_report(wallet_report_id)
@@ -60,6 +65,14 @@ fn get_wallet_report_classification(report_id: Uuid) -> Result<RatingClassificat
 fn get_wallet_report(report_id: Uuid) -> Result<WalletReport> {
     let mut database = Database::connect()?;
     Ok(database.get_wallet_report(report_id)?)
+}
+
+#[delete("/delete_user/{api_key}")]
+async fn delete_user_endpoint(api_key: web::Path<String>) -> impl Responder {
+    match delete_user(api_key.as_str()) {
+        Ok(_) => HttpResponse::Ok().json("Successfully deleted user"),
+        Err(_) => HttpResponse::InternalServerError().json("Unable to process request"),
+    }
 }
 
 #[delete("/delete_wallet_report/{report_id}")]
@@ -173,6 +186,7 @@ async fn main() -> std::io::Result<()> {
             .service(get_wallet_report_metrics_endpoint)
             .service(create_user_endpoint)
             .service(delete_wallet_report_endpoint)
+            .service(delete_user_endpoint)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
