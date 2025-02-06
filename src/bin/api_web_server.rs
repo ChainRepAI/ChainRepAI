@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use actix_web::{delete, get, post, web, App, HttpResponse, HttpServer, Responder};
 use anyhow::Result;
 use chrono::NaiveDateTime;
@@ -14,6 +16,11 @@ use SolAnalystAI::{
     pulsar::pulsar::PulsarClient,
     worker::worker::WALLET_REPUTATION_TOPIC,
 };
+
+fn get_wallet_reports(from_score: i32, to_score: i32) -> Result<Vec<WalletReport>> {
+    let mut database = Database::connect()?;
+    database.get_reports_between_scores(from_score, to_score)
+}
 
 fn delete_user(api_key: &str) -> Result<()> {
     let mut database = Database::connect()?;
@@ -66,6 +73,17 @@ fn get_wallet_report_classification(report_id: Uuid) -> Result<RatingClassificat
 fn get_wallet_report(report_id: Uuid) -> Result<WalletReport> {
     let mut database = Database::connect()?;
     database.get_wallet_report(report_id)
+}
+
+#[get("/get_wallets")]
+async fn get_wallet_reports_endpoint(query: web::Query<HashMap<String, String>>) -> impl Responder {
+    let from_score = query.get("from_score").and_then(|s| s.parse::<i32>().ok()).unwrap_or(0);
+    let to_score = query.get("to_score").and_then(|s| s.parse::<i32>().ok()).unwrap_or(1000);
+
+    match get_wallet_reports(from_score, to_score) {
+        Ok(wallet_reports) => HttpResponse::Ok().json(wallet_reports),
+        Err(_) => HttpResponse::InternalServerError().json("Unable to fetch wallets between specified values"),
+    }
 }
 
 #[delete("/delete_user/{api_key}")]
@@ -345,6 +363,7 @@ async fn main() -> std::io::Result<()> {
             .service(create_user_endpoint)
             .service(delete_wallet_report_endpoint)
             .service(delete_user_endpoint)
+            .service(get_wallet_reports_endpoint)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
