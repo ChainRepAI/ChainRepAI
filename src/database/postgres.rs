@@ -188,4 +188,13 @@ impl Database {
             .load::<WalletReport>(&mut self.conn)?;
         Ok(reports)
     }
+
+    pub fn get_recent_wallet_reports(&mut self, days: i64) -> Result<Vec<WalletReport>> {
+        let recent_date = chrono::Utc::now().naive_utc() - chrono::Duration::days(days);
+        let reports = wallet_report::table
+            .filter(wallet_report::report_creation_date.ge(recent_date))
+            .load::<WalletReport>(&mut self.conn)?;
+        info!("Successfully fetched wallet reports from the last {} days", days);
+        Ok(reports)
+    }
 }
