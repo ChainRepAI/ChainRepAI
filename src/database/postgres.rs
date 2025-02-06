@@ -181,4 +181,11 @@ impl Database {
             .filter(wallet_report::rating_score.le(to_score))
             .get_results(&mut self.conn)?)
     }
+
+    pub fn get_wallet_reports_by_classification(&mut self, classification: RatingClassification) -> Result<Vec<WalletReport>> {
+        let reports = wallet_report::table
+            .filter(wallet_report::rating_classification.eq(classification))
+            .load::<WalletReport>(&mut self.conn)?;
+        Ok(reports)
+    }
 }
