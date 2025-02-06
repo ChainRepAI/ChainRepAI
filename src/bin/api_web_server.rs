@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, ops::Deref};
 
 use actix_web::{delete, get, post, web, App, HttpResponse, HttpServer, Responder};
 use anyhow::Result;
@@ -16,6 +16,11 @@ use SolAnalystAI::{
     pulsar::pulsar::PulsarClient,
     worker::worker::WALLET_REPUTATION_TOPIC,
 };
+
+fn get_wallet_reports_by_classification(report_classification: RatingClassification) -> Result<Vec<WalletReport>> {
+    let mut database = Database::connect()?;
+    database.get_wallet_reports_by_classification(report_classification)
+}
 
 fn get_wallet_reports(from_score: i32, to_score: i32) -> Result<Vec<WalletReport>> {
     let mut database = Database::connect()?;
@@ -73,6 +78,14 @@ fn get_wallet_report_classification(report_id: Uuid) -> Result<RatingClassificat
 fn get_wallet_report(report_id: Uuid) -> Result<WalletReport> {
     let mut database = Database::connect()?;
     database.get_wallet_report(report_id)
+}
+
+#[get("/get_wallet_reports_by_classification/{report_classification}")]
+async fn get_wallet_reports_by_classification_endpoint(report_classification: web::Path<RatingClassification>) -> impl Responder {
+    match get_wallet_reports_by_classification(report_classification.to_owned()) {
+        Ok(wallet_reports) => HttpResponse::Ok().json(wallet_reports),
+        Err(_) => HttpResponse::InternalServerError().json("Unable to fetch wallet reports."),
+    }
 }
 
 #[get("/get_wallets")]
@@ -364,6 +377,7 @@ async fn main() -> std::io::Result<()> {
             .service(delete_wallet_report_endpoint)
             .service(delete_user_endpoint)
             .service(get_wallet_reports_endpoint)
+            .service(get_wallet_reports_by_classification_endpoint)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
