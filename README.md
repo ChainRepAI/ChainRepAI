@@ -57,6 +57,7 @@ Although the overall rating is AAA, the recent activity pattern may present a ri
 | DELETE         | `/delete_user/{api_key}`                | Deletes the wallet report.    
 | GET         | `/get_wallet_reports`                      | Gets all wallet reports between the specified score params: `from_score` and `to_score`.
 | GET         | `/get_wallet_reports_by_classification/{report_classification}`| Gets all wallet reports with the specified report classification.
+| GET         | `/get_recent_wallet_reports/{days}`| Gets all wallet reports within the last n specified days.
 
 
 ## Breakdown of the Reputational Indicators
