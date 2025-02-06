@@ -55,6 +55,8 @@ Although the overall rating is AAA, the recent activity pattern may present a ri
 | POST         | `/create_user`                            | Creates a new user and returns the new associated api key.                                                           |
 | DELETE         | `/delete_wallet_report/{report_id}`     | Deletes the wallet report.    
 | DELETE         | `/delete_user/{api_key}`                | Deletes the wallet report.    
+| GET         | `/get_wallet_reports`                      | Gets all wallet reports between the specified score params: `from_score` and `to_score`.
+
 
 ## Breakdown of the Reputational Indicators
 
