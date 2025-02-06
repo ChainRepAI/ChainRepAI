@@ -174,4 +174,11 @@ impl Database {
         info!("Successfully deleted user with api_key: {}", api_key);
         Ok(())
     }
+
+    pub fn get_reports_between_scores(&mut self, from_score: i32, to_score: i32) -> Result<Vec<WalletReport>> {
+        Ok(wallet_report::table
+            .filter(wallet_report::rating_score.ge(from_score))
+            .filter(wallet_report::rating_score.le(to_score))
+            .get_results(&mut self.conn)?)
+    }
 }
