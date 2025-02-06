@@ -1,4 +1,8 @@
-use std::{cmp::{max, min}, collections::HashMap, ops::Deref};
+use std::{
+    cmp::{max, min},
+    collections::HashMap,
+    ops::Deref,
+};
 
 use actix_web::{delete, get, post, web, App, HttpResponse, HttpServer, Responder};
 use anyhow::Result;
@@ -90,9 +94,7 @@ fn get_wallet_report(report_id: Uuid) -> Result<WalletReport> {
 }
 
 #[get("/get_recent_wallet_reports/{days}")]
-async fn get_recent_wallet_reports_endpoint(
-    days: web::Path<i64>,
-) -> impl Responder {
+async fn get_recent_wallet_reports_endpoint(days: web::Path<i64>) -> impl Responder {
     match get_recent_wallet_reports(min(MAX_RECENT_DAYS, max(0, *days))) {
         Ok(wallet_reports) => HttpResponse::Ok().json(wallet_reports),
         Err(_) => HttpResponse::InternalServerError().json("Unable to fetch wallet reports."),
