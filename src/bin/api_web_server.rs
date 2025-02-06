@@ -17,7 +17,9 @@ use SolAnalystAI::{
     worker::worker::WALLET_REPUTATION_TOPIC,
 };
 
-fn get_wallet_reports_by_classification(report_classification: RatingClassification) -> Result<Vec<WalletReport>> {
+fn get_wallet_reports_by_classification(
+    report_classification: RatingClassification,
+) -> Result<Vec<WalletReport>> {
     let mut database = Database::connect()?;
     database.get_wallet_reports_by_classification(report_classification)
 }
@@ -81,7 +83,9 @@ fn get_wallet_report(report_id: Uuid) -> Result<WalletReport> {
 }
 
 #[get("/get_wallet_reports_by_classification/{report_classification}")]
-async fn get_wallet_reports_by_classification_endpoint(report_classification: web::Path<RatingClassification>) -> impl Responder {
+async fn get_wallet_reports_by_classification_endpoint(
+    report_classification: web::Path<RatingClassification>,
+) -> impl Responder {
     match get_wallet_reports_by_classification(report_classification.to_owned()) {
         Ok(wallet_reports) => HttpResponse::Ok().json(wallet_reports),
         Err(_) => HttpResponse::InternalServerError().json("Unable to fetch wallet reports."),
@@ -90,12 +94,19 @@ async fn get_wallet_reports_by_classification_endpoint(report_classification: we
 
 #[get("/get_wallets")]
 async fn get_wallet_reports_endpoint(query: web::Query<HashMap<String, String>>) -> impl Responder {
-    let from_score = query.get("from_score").and_then(|s| s.parse::<i32>().ok()).unwrap_or(0);
-    let to_score = query.get("to_score").and_then(|s| s.parse::<i32>().ok()).unwrap_or(1000);
+    let from_score = query
+        .get("from_score")
+        .and_then(|s| s.parse::<i32>().ok())
+        .unwrap_or(0);
+    let to_score = query
+        .get("to_score")
+        .and_then(|s| s.parse::<i32>().ok())
+        .unwrap_or(1000);
 
     match get_wallet_reports(from_score, to_score) {
         Ok(wallet_reports) => HttpResponse::Ok().json(wallet_reports),
-        Err(_) => HttpResponse::InternalServerError().json("Unable to fetch wallets between specified values"),
+        Err(_) => HttpResponse::InternalServerError()
+            .json("Unable to fetch wallets between specified values"),
     }
 }
 

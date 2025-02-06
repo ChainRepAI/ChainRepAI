@@ -22,7 +22,10 @@ pub struct Database {
 impl Database {
     pub fn connect() -> Result<Self> {
         let database_url = std::env::var("DATABASE_URL")?;
-        info!("Attempting to establish a connection to the database at {}", database_url);
+        info!(
+            "Attempting to establish a connection to the database at {}",
+            database_url
+        );
         let conn = PgConnection::establish(&database_url)?;
         info!("Successfully connected to the database");
         Ok(Self { conn })
@@ -41,7 +44,10 @@ impl Database {
             .filter(wallet_report::id.eq(wallet_report_id))
             .select(wallet_report::all_columns)
             .first::<WalletReport>(&mut self.conn)?;
-        info!("Successfully fetched wallet report with id: {}", wallet_report_id);
+        info!(
+            "Successfully fetched wallet report with id: {}",
+            wallet_report_id
+        );
         Ok(report)
     }
 
@@ -49,36 +55,54 @@ impl Database {
         &mut self,
         wallet_report_id: Uuid,
     ) -> Result<RatingClassification> {
-        info!("Fetching rating classification for wallet report id: {}", wallet_report_id);
+        info!(
+            "Fetching rating classification for wallet report id: {}",
+            wallet_report_id
+        );
         let classification = wallet_report::table
             .filter(wallet_report::id.eq(wallet_report_id))
             .select(wallet_report::all_columns)
             .first::<WalletReport>(&mut self.conn)?
             .rating_classification;
-        info!("Successfully fetched rating classification for wallet report id: {}", wallet_report_id);
+        info!(
+            "Successfully fetched rating classification for wallet report id: {}",
+            wallet_report_id
+        );
         Ok(classification)
     }
 
     pub fn get_wallet_report_score(&mut self, wallet_report_id: Uuid) -> Result<i32> {
-        info!("Fetching rating score for wallet report id: {}", wallet_report_id);
+        info!(
+            "Fetching rating score for wallet report id: {}",
+            wallet_report_id
+        );
         let score = wallet_report::table
             .filter(wallet_report::id.eq(wallet_report_id))
             .select(wallet_report::all_columns)
             .first::<WalletReport>(&mut self.conn)?
             .rating_score;
-        info!("Successfully fetched rating score for wallet report id: {}", wallet_report_id);
+        info!(
+            "Successfully fetched rating score for wallet report id: {}",
+            wallet_report_id
+        );
         Ok(score)
     }
 
     pub fn get_wallet_report_case_report(&mut self, wallet_report_id: Uuid) -> Result<CaseReport> {
-        info!("Fetching case report for wallet report id: {}", wallet_report_id);
+        info!(
+            "Fetching case report for wallet report id: {}",
+            wallet_report_id
+        );
         let case_report_value = wallet_report::table
             .filter(wallet_report::id.eq(wallet_report_id))
             .select(wallet_report::all_columns)
             .first::<WalletReport>(&mut self.conn)?
             .case_report;
         let case_report: CaseReport = from_value(case_report_value)?;
-        info!("Successfully fetched case report for wallet report id: {}", wallet_report_id);
+        info!(
+            "Successfully fetched case report for wallet report id: {}",
+            wallet_report_id
+        );
         Ok(case_report)
     }
 
@@ -86,13 +110,19 @@ impl Database {
         &mut self,
         wallet_report_id: Uuid,
     ) -> Result<NaiveDateTime> {
-        info!("Fetching creation date for wallet report id: {}", wallet_report_id);
+        info!(
+            "Fetching creation date for wallet report id: {}",
+            wallet_report_id
+        );
         let creation_date = wallet_report::table
             .filter(wallet_report::id.eq(wallet_report_id))
             .select(wallet_report::all_columns)
             .first::<WalletReport>(&mut self.conn)?
             .report_creation_date;
-        info!("Successfully fetched creation date for wallet report id: {}", wallet_report_id);
+        info!(
+            "Successfully fetched creation date for wallet report id: {}",
+            wallet_report_id
+        );
         Ok(creation_date)
     }
 
@@ -103,7 +133,10 @@ impl Database {
             .count()
             .get_result::<i64>(&mut self.conn)
             .unwrap_or_else(|e| {
-                error!("Failed to count wallet reports for address {}: {}", wallet_addr, e);
+                error!(
+                    "Failed to count wallet reports for address {}: {}",
+                    wallet_addr, e
+                );
                 0
             });
         info!("Wallet report count for {}: {}", wallet_addr, count);
@@ -111,20 +144,32 @@ impl Database {
     }
 
     pub fn insert_wallet_metrics(&mut self, wallet_metrics: WalletMetrics) -> Result<()> {
-        info!("Inserting wallet metrics for wallet_report_id: {}", wallet_metrics.wallet_report_id);
+        info!(
+            "Inserting wallet metrics for wallet_report_id: {}",
+            wallet_metrics.wallet_report_id
+        );
         insert_into(wallet_metrics::table)
             .values(&wallet_metrics)
             .execute(&mut self.conn)?;
-        info!("Successfully inserted wallet metrics for wallet_report_id: {}", wallet_metrics.wallet_report_id);
+        info!(
+            "Successfully inserted wallet metrics for wallet_report_id: {}",
+            wallet_metrics.wallet_report_id
+        );
         Ok(())
     }
 
     pub fn get_wallet_metrics(&mut self, wallet_report_id: Uuid) -> Result<WalletMetrics> {
-        info!("Fetching wallet metrics for wallet_report_id: {}", wallet_report_id);
+        info!(
+            "Fetching wallet metrics for wallet_report_id: {}",
+            wallet_report_id
+        );
         let metrics = wallet_metrics::table
             .filter(wallet_metrics::wallet_report_id.eq(wallet_report_id))
             .first(&mut self.conn)?;
-        info!("Successfully fetched wallet metrics for wallet_report_id: {}", wallet_report_id);
+        info!(
+            "Successfully fetched wallet metrics for wallet_report_id: {}",
+            wallet_report_id
+        );
         Ok(metrics)
     }
 
@@ -157,12 +202,15 @@ impl Database {
                     .filter(wallet_metrics::wallet_report_id.eq(wallet_report_id))
                     .execute(conn)?;
 
-                    delete(wallet_report::table)
+                delete(wallet_report::table)
                     .filter(wallet_report::id.eq(wallet_report_id))
                     .execute(conn)?;
                 Ok(())
             })?;
-        info!("Successfully deleted report and associated metrics for wallet_report_id: {}", wallet_report_id);
+        info!(
+            "Successfully deleted report and associated metrics for wallet_report_id: {}",
+            wallet_report_id
+        );
         Ok(())
     }
 
@@ -175,14 +223,21 @@ impl Database {
         Ok(())
     }
 
-    pub fn get_reports_between_scores(&mut self, from_score: i32, to_score: i32) -> Result<Vec<WalletReport>> {
+    pub fn get_reports_between_scores(
+        &mut self,
+        from_score: i32,
+        to_score: i32,
+    ) -> Result<Vec<WalletReport>> {
         Ok(wallet_report::table
             .filter(wallet_report::rating_score.ge(from_score))
             .filter(wallet_report::rating_score.le(to_score))
             .get_results(&mut self.conn)?)
     }
 
-    pub fn get_wallet_reports_by_classification(&mut self, classification: RatingClassification) -> Result<Vec<WalletReport>> {
+    pub fn get_wallet_reports_by_classification(
+        &mut self,
+        classification: RatingClassification,
+    ) -> Result<Vec<WalletReport>> {
         let reports = wallet_report::table
             .filter(wallet_report::rating_classification.eq(classification))
             .load::<WalletReport>(&mut self.conn)?;
@@ -194,7 +249,10 @@ impl Database {
         let reports = wallet_report::table
             .filter(wallet_report::report_creation_date.ge(recent_date))
             .load::<WalletReport>(&mut self.conn)?;
-        info!("Successfully fetched wallet reports from the last {} days", days);
+        info!(
+            "Successfully fetched wallet reports from the last {} days",
+            days
+        );
         Ok(reports)
     }
 }
