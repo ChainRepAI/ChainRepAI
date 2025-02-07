@@ -11,8 +11,8 @@ use uuid::Uuid;
 use crate::case_report::case_report::CaseReport;
 
 use super::{
-    models::{RatingClassification, User, WalletMetrics, WalletReport},
-    schema::{users, wallet_metrics, wallet_report},
+    models::{KnownDiscreditedWallet, RatingClassification, User, WalletMetrics, WalletReport},
+    schema::{known_discredited_wallets, users, wallet_metrics, wallet_report},
 };
 
 pub struct Database {
@@ -254,5 +254,12 @@ impl Database {
             days
         );
         Ok(reports)
+    }
+
+    pub fn insert_discredited_wallet(&mut self, known_discredited_wallet: KnownDiscreditedWallet) -> Result<()> {
+        insert_into(known_discredited_wallets::table)
+            .values(known_discredited_wallet)
+            .execute(&mut self.conn)?;
+        Ok(())
     }
 }
