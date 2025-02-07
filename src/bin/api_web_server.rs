@@ -1,7 +1,6 @@
 use std::{
     cmp::{max, min},
     collections::HashMap,
-    ops::Deref,
 };
 
 use actix_web::{delete, get, post, web, App, HttpResponse, HttpServer, Responder};

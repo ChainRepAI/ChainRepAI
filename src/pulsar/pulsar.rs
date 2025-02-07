@@ -90,6 +90,7 @@ pub struct PulsarProducer {
 
 impl PulsarProducer {
     pub async fn enqueue_job(&mut self, event: WalletReportJob) -> Result<()> {
+        self.internal_producer.send_non_blocking(event).await?;
         info!("Enqueuing job on producer with id: {}", self.id);
         Ok(())
     }
