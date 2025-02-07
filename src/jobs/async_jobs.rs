@@ -5,8 +5,11 @@ use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
 use crate::{
-    case_report::case_report::CaseReport, database::models::{KnownDiscreditedWallet, WalletReport},
-    reputation::reputation::Reputation, wallet::wallet::Wallet, worker::worker::WalletReportWorker,
+    case_report::case_report::CaseReport,
+    database::models::{KnownDiscreditedWallet, WalletReport},
+    reputation::reputation::Reputation,
+    wallet::wallet::Wallet,
+    worker::worker::WalletReportWorker,
 };
 
 const DISCREDITED_SCORE_RATING_BOUNDARY: i32 = 400;
@@ -82,7 +85,9 @@ impl WalletReportJob {
         );
 
         if reputation.rating_score < DISCREDITED_SCORE_RATING_BOUNDARY {
-            worker.database.insert_discredited_wallet(KnownDiscreditedWallet::new(self.wallet_addr.clone()))?
+            worker
+                .database
+                .insert_discredited_wallet(KnownDiscreditedWallet::new(self.wallet_addr.clone()))?
         }
 
         info!(
