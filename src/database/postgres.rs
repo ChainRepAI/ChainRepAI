@@ -256,7 +256,10 @@ impl Database {
         Ok(reports)
     }
 
-    pub fn insert_discredited_wallet(&mut self, known_discredited_wallet: KnownDiscreditedWallet) -> Result<()> {
+    pub fn insert_discredited_wallet(
+        &mut self,
+        known_discredited_wallet: KnownDiscreditedWallet,
+    ) -> Result<()> {
         insert_into(known_discredited_wallets::table)
             .values(known_discredited_wallet)
             .execute(&mut self.conn)?;
