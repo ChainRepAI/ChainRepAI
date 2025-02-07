@@ -40,4 +40,11 @@ diesel::table! {
     }
 }
 
+diesel::table! {
+    known_discredited_wallets (wallet_addr) {
+        wallet_addr -> Text,
+        tracked_at -> Timestamp,
+    }
+}
+
 diesel::allow_tables_to_appear_in_same_query!(wallet_metrics, wallet_report,);
