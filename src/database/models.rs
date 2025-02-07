@@ -151,3 +151,20 @@ impl User {
         }
     }
 }
+
+#[derive(Insertable, Queryable, Debug, Serialize, Clone)]
+#[diesel(table_name = crate::database::schema::known_discredited_wallets)]
+#[diesel(check_for_backend(diesel::pg::Pg))]
+pub struct KnownDiscreditedWallets {
+    pub wallet_addr: String,
+    pub tracked_at: NaiveDateTime,
+}
+
+impl KnownDiscreditedWallets {
+    pub fn new(wallet_addr: String) -> Self {
+        Self {
+            wallet_addr,
+            tracked_at: Utc::now().naive_local(),
+        }
+    }
+}
