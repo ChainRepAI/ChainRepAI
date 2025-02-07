@@ -6,7 +6,7 @@ use pulsar::{
 };
 use uuid::Uuid; // Import logging macros
 
-use crate::jobs::jobs::WalletReportJob;
+use crate::jobs::async_jobs::WalletReportJob;
 
 const PULSAR_ADDR: &str = "pulsar://localhost:6650";
 const MAX_JOB_RETRY: usize = 3;

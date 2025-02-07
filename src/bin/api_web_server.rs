@@ -16,7 +16,7 @@ use SolAnalystAI::{
         models::{RatingClassification, User, WalletMetrics, WalletReport},
         postgres::Database,
     },
-    jobs::jobs::WalletReportJob,
+    jobs::async_jobs::WalletReportJob,
     pulsar::pulsar::PulsarClient,
     worker::worker::WALLET_REPUTATION_TOPIC,
 };
