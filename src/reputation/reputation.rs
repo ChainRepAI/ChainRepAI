@@ -318,6 +318,34 @@ pub struct ReputationPenalty {
     reasoning: Vec<String>,
 }
 
+impl From<&WalletRewards> for ReputationPenalty {
+    fn from(wallet_rewards: &WalletRewards) -> Self {
+        let (severity, mut reasoning) = match wallet_rewards.0 {
+            b if b < 1 => (
+                PenaltySeverity::High,
+                vec!["Wallet rewards < 1".to_string()],
+            ),
+            b if b < 5 => (
+                PenaltySeverity::Medium,
+                vec!["Balance between 1 and 5".to_string()],
+            ),
+            b if b < 20 => (
+                PenaltySeverity::Low,
+                vec!["Balance between 5 and 20".to_string()],
+            ),
+            _ => (
+                PenaltySeverity::None,
+                vec!["Balance >= 20 Solana".to_string()],
+            ),
+        };
+        reasoning.push(format!("Wallet rewards: {:?}", wallet_rewards.0));
+        Self {
+            severity,
+            reasoning,
+        }
+    }
+}
+
 impl From<&WalletBalance> for ReputationPenalty {
     fn from(balance: &WalletBalance) -> Self {
         let (severity, mut reasoning) = match balance.0 {
