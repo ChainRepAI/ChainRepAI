@@ -12,6 +12,26 @@ use crate::{
     wallet::wallet::Wallet,
 };
 
+pub struct WalletRewards(i64);
+
+impl WalletRewards {
+    pub fn calculate(
+        confirmed_transactions: &Vec<EncodedConfirmedTransactionWithStatusMeta>,
+    ) -> Self {
+        let mut total_rewards = 0;
+
+        for transaction in confirmed_transactions {
+            if let Some(meta) = &transaction.transaction.meta {
+                for reward in meta.rewards.clone().unwrap() {
+                    total_rewards += reward.lamports
+                }
+            }
+        }
+
+        Self(total_rewards)
+    }
+}
+
 pub struct TransactionsWithNewWallets(f64);
 
 impl TransactionsWithNewWallets {
