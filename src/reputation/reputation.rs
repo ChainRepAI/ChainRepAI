@@ -18,15 +18,11 @@ impl WalletRewards {
     pub fn calculate(
         confirmed_transactions: &Vec<EncodedConfirmedTransactionWithStatusMeta>,
     ) -> Self {
-        let mut total_rewards = 0;
-
-        for transaction in confirmed_transactions {
-            if let Some(meta) = &transaction.transaction.meta {
-                for reward in meta.rewards.clone().unwrap() {
-                    total_rewards += reward.lamports
-                }
-            }
-        }
+        let total_rewards = confirmed_transactions.iter()
+            .filter_map(|tx| tx.transaction.meta.as_ref())
+            .flat_map(|meta| meta.rewards.clone().unwrap_or_else(Vec::new))
+            .map(|reward| reward.lamports)
+            .sum();
 
         Self(total_rewards)
     }
