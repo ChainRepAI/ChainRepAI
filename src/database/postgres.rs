@@ -262,4 +262,14 @@ impl Database {
             .execute(&mut self.conn)?;
         Ok(())
     }
+
+    pub fn find_discredited_associates(
+        &mut self,
+        associated_wallets: Vec<String>,
+    ) -> Result<Vec<KnownDiscreditedWallet>> {
+        Ok(known_discredited_wallets::table
+            .filter(known_discredited_wallets::wallet_addr.eq_any(associated_wallets))
+            .select(known_discredited_wallets::all_columns)
+            .get_results(&mut self.conn)?)
+    }
 }
