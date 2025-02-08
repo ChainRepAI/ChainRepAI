@@ -22,7 +22,7 @@ pub struct Reputation {
 }
 
 impl Reputation {
-    fn calc_rating_score(penalties: &Vec<ReputationPenalty>) -> i32 {
+    fn calc_rating_score(penalties: &[ReputationPenalty]) -> i32 {
         penalties.iter().fold(1000, |score, penalty| {
             score
                 - match penalty.severity {
@@ -77,7 +77,7 @@ impl Reputation {
             (&days_since_last_block).into(),
             (&transaction_failure_rate).into(),
             fee_penalty_1,
-            fee_penalty_2
+            fee_penalty_2,
         ];
 
         log::info!("Penalties calculated: {:?}", penalties);

@@ -1,7 +1,4 @@
-use std::{
-    cmp::{max, min},
-    collections::HashMap,
-};
+use std::collections::HashMap;
 
 use actix_web::{delete, get, post, web, App, HttpResponse, HttpServer, Responder};
 use dotenv::dotenv;

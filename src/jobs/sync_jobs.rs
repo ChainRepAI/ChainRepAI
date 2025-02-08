@@ -46,7 +46,7 @@ pub fn create_user() -> Result<String> {
 
 pub fn get_wallet_report_metrics(report_id: Uuid) -> Result<WalletMetrics> {
     let mut database = Database::connect()?;
-    Ok(database.get_wallet_metrics(report_id)?)
+    database.get_wallet_metrics(report_id)
 }
 
 pub fn get_wallet_report_count(wallet_addr: String) -> Result<i64> {
@@ -56,22 +56,22 @@ pub fn get_wallet_report_count(wallet_addr: String) -> Result<i64> {
 
 pub fn get_wallet_report_creation_date(report_id: Uuid) -> Result<NaiveDateTime> {
     let mut database = Database::connect()?;
-    Ok(database.get_wallet_report_creation_date(report_id)?)
+    database.get_wallet_report_creation_date(report_id)
 }
 
 pub fn get_wallet_report_case_report(report_id: Uuid) -> Result<CaseReport> {
     let mut database = Database::connect()?;
-    Ok(database.get_wallet_report_case_report(report_id)?)
+    database.get_wallet_report_case_report(report_id)
 }
 
 pub fn get_wallet_report_score(report_id: Uuid) -> Result<i32> {
     let mut database = Database::connect()?;
-    Ok(database.get_wallet_report_score(report_id)?)
+    database.get_wallet_report_score(report_id)
 }
 
 pub fn get_wallet_report_classification(report_id: Uuid) -> Result<RatingClassification> {
     let mut database = Database::connect()?;
-    Ok(database.get_wallet_report_classification(report_id)?)
+    database.get_wallet_report_classification(report_id)
 }
 
 pub fn get_wallet_report(report_id: Uuid) -> Result<WalletReport> {

@@ -8,9 +8,7 @@ use solana_transaction_status::EncodedConfirmedTransactionWithStatusMeta;
 pub struct WalletRewards(pub i64);
 
 impl WalletRewards {
-    pub fn calculate(
-        confirmed_transactions: &Vec<EncodedConfirmedTransactionWithStatusMeta>,
-    ) -> Self {
+    pub fn calculate(confirmed_transactions: &[EncodedConfirmedTransactionWithStatusMeta]) -> Self {
         let total_rewards = confirmed_transactions
             .iter()
             .filter_map(|tx| tx.transaction.meta.as_ref())
@@ -71,7 +69,7 @@ impl WalletBalanceVolatility {
                 tx.transaction
                     .meta
                     .as_ref()
-                    .and_then(|meta| meta.post_balances.get(0))
+                    .and_then(|meta| meta.post_balances.first())
                     .map(|balance| *balance as f64)
             })
             .collect();
@@ -111,9 +109,7 @@ pub struct TxPerHour(pub i64);
 
 impl TxPerHour {
     /// Calculates transaction volume over last 1000 transactions
-    pub fn calculate(
-        transaction_history: &Vec<RpcConfirmedTransactionStatusWithSignature>,
-    ) -> Self {
+    pub fn calculate(transaction_history: &[RpcConfirmedTransactionStatusWithSignature]) -> Self {
         let num_hours = transaction_history
             .first()
             .and_then(|first_tx| first_tx.block_time)
@@ -133,7 +129,7 @@ pub struct DaysSinceLastBlock(pub u64);
 
 impl DaysSinceLastBlock {
     pub fn calculate(
-        transaction_history: &Vec<RpcConfirmedTransactionStatusWithSignature>,
+        transaction_history: &[RpcConfirmedTransactionStatusWithSignature],
     ) -> Option<Self> {
         transaction_history
             .last()
@@ -157,7 +153,7 @@ pub struct PrioritizationFeesMetrics {
 }
 
 impl PrioritizationFeesMetrics {
-    pub fn calculate(prioritization_fees: &Vec<RpcPrioritizationFee>) -> Self {
+    pub fn calculate(prioritization_fees: &[RpcPrioritizationFee]) -> Self {
         let fees: Vec<f64> = prioritization_fees
             .iter()
             .map(|fee| fee.prioritization_fee as f64)
@@ -186,9 +182,7 @@ impl PrioritizationFeesMetrics {
 pub struct TransactionFailureRate(pub f64);
 
 impl TransactionFailureRate {
-    pub fn calculate(
-        transaction_history: &Vec<RpcConfirmedTransactionStatusWithSignature>,
-    ) -> Self {
+    pub fn calculate(transaction_history: &[RpcConfirmedTransactionStatusWithSignature]) -> Self {
         if transaction_history.is_empty() {
             return Self(0.0);
         }
