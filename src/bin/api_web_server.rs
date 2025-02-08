@@ -26,7 +26,7 @@ const MAX_RECENT_DAYS: i64 = 5;
 
 #[get("/get_recent_wallet_reports/{days}")]
 async fn get_recent_wallet_reports_endpoint(days: web::Path<i64>) -> impl Responder {
-    match get_recent_wallet_reports(min(MAX_RECENT_DAYS, max(0, *days))) {
+    match get_recent_wallet_reports((*days).clamp(0, MAX_RECENT_DAYS)) {
         Ok(wallet_reports) => HttpResponse::Ok().json(wallet_reports),
         Err(_) => HttpResponse::InternalServerError().json("Unable to fetch wallet reports."),
     }

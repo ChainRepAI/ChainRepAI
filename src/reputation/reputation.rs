@@ -50,7 +50,7 @@ impl Reputation {
         let days_since_last_block = DaysSinceLastBlock::calculate(&wallet.transaction_history)
             .unwrap_or_else(|| {
                 log::warn!("Days since last block calculation failed, using default max value");
-                DaysSinceLastBlock(std::u64::MAX)
+                DaysSinceLastBlock(u64::MAX)
             });
         log::debug!(
             "Computed days since last block: {:?}",
@@ -70,14 +70,15 @@ impl Reputation {
             prio_fee_metrics
         );
 
-        let mut penalties: Vec<ReputationPenalty> = vec![];
-        // add penalties
-        penalties.push((&tx_per_hour).into());
-        penalties.push((&wallet_balance).into());
-        penalties.push((&days_since_last_block).into());
-        penalties.push((&transaction_failure_rate).into());
         let (fee_penalty_1, fee_penalty_2) = (&prio_fee_metrics).into();
-        penalties.extend([fee_penalty_1, fee_penalty_2]);
+        let penalties = vec![
+            (&tx_per_hour).into(),
+            (&wallet_balance).into(),
+            (&days_since_last_block).into(),
+            (&transaction_failure_rate).into(),
+            fee_penalty_1,
+            fee_penalty_2
+        ];
 
         log::info!("Penalties calculated: {:?}", penalties);
         let rating_score = Self::calc_rating_score(&penalties);
@@ -177,7 +178,7 @@ impl From<&WalletBalance> for ReputationPenalty {
 impl From<&TxPerHour> for ReputationPenalty {
     fn from(tx_per_hour: &TxPerHour) -> Self {
         let (severity, mut reasoning) = match tx_per_hour.0 {
-            v if v == 0 => (
+            0 => (
                 PenaltySeverity::High,
                 vec!["No transaction volume".to_string()],
             ),
@@ -205,7 +206,7 @@ impl From<&TxPerHour> for ReputationPenalty {
 impl From<&DaysSinceLastBlock> for ReputationPenalty {
     fn from(days: &DaysSinceLastBlock) -> Self {
         let (severity, mut reasoning) = match days.0 {
-            d if d == 0 => (
+            0 => (
                 PenaltySeverity::None,
                 vec!["Recent activity in less than a day".to_string()],
             ),
