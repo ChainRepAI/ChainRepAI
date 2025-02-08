@@ -73,3 +73,29 @@ impl KnownCreditedAssociates {
 pub struct KnownAssociates {
     wallets: Vec<String>,
 }
+
+impl KnownAssociates {
+    pub fn new(
+        database: &mut Database,
+        transactions: Vec<EncodedConfirmedTransactionWithStatusMeta>,
+    ) -> Result<Self> {
+        let wallets: Vec<String> = transactions
+            .into_iter()
+            .flat_map(|tx| {
+                tx.transaction
+                    .transaction
+                    .decode()
+                    .map_or_else(Vec::new, |versioned_tx| {
+                        versioned_tx
+                            .message
+                            .static_account_keys()
+                            .iter()
+                            .map(|key| key.to_string())
+                            .collect()
+                    })
+            })
+            .collect();
+
+        Ok(Self { wallets })
+    }
+}
