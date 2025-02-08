@@ -43,42 +43,21 @@ pub struct KnownCreditedAssociates {
 }
 
 impl KnownCreditedAssociates {
-    pub fn new(
+    pub fn new_from_associates(
         database: &mut Database,
-        transactions: Vec<EncodedConfirmedTransactionWithStatusMeta>,
+        known_associates: &KnownAssociates,
     ) -> Result<Self> {
-        let keys: Vec<String> = transactions
-            .into_iter()
-            .flat_map(|tx| {
-                tx.transaction
-                    .transaction
-                    .decode()
-                    .map_or_else(Vec::new, |versioned_tx| {
-                        versioned_tx
-                            .message
-                            .static_account_keys()
-                            .iter()
-                            .map(|key| key.to_string())
-                            .collect()
-                    })
-            })
-            .collect();
-
-        let wallets = database.find_credited_associates(keys)?;
-
+        let wallets = database.find_credited_associates(&known_associates.wallets)?;
         Ok(Self { wallets })
     }
 }
 
 pub struct KnownAssociates {
-    wallets: Vec<String>,
+    pub wallets: Vec<String>,
 }
 
 impl KnownAssociates {
-    pub fn new(
-        database: &mut Database,
-        transactions: Vec<EncodedConfirmedTransactionWithStatusMeta>,
-    ) -> Result<Self> {
+    pub fn new(transactions: Vec<EncodedConfirmedTransactionWithStatusMeta>) -> Result<Self> {
         let wallets: Vec<String> = transactions
             .into_iter()
             .flat_map(|tx| {
