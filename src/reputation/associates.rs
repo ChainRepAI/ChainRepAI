@@ -69,3 +69,7 @@ impl KnownCreditedAssociates {
         Ok(Self { wallets })
     }
 }
+
+pub struct KnownAssociates {
+    wallets: Vec<String>,
+}
