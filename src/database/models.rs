@@ -176,3 +176,12 @@ pub struct KnownCreditedWallet {
     pub wallet_addr: String,
     pub tracked_at: NaiveDateTime,
 }
+
+impl KnownCreditedWallet {
+    pub fn new(wallet_addr: String) -> Self {
+        Self {
+            wallet_addr,
+            tracked_at: Utc::now().naive_local(),
+        }
+    }
+}
