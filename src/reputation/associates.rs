@@ -1,7 +1,10 @@
 use anyhow::Result;
 use solana_transaction_status::EncodedConfirmedTransactionWithStatusMeta;
 
-use crate::database::{models::KnownDiscreditedWallet, postgres::Database};
+use crate::database::{
+    models::{KnownCreditedWallet, KnownDiscreditedWallet},
+    postgres::Database,
+};
 
 pub struct KnownDiscreditedAssociates {
     pub wallets: Vec<KnownDiscreditedWallet>,
@@ -33,4 +36,8 @@ impl KnownDiscreditedAssociates {
 
         Ok(Self { wallets })
     }
+}
+
+pub struct KnownCreditedAssociates {
+    pub wallets: Vec<KnownCreditedWallet>,
 }
