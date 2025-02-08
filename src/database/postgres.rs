@@ -285,4 +285,14 @@ impl Database {
             .execute(&mut self.conn)?;
         Ok(())
     }
+
+    pub fn find_credited_associates(
+        &mut self,
+        associated_wallets: Vec<String>
+    ) -> Result<Vec<KnownCreditedWallet>> {
+        Ok(known_credited_wallets::table
+            .filter(known_credited_wallets::wallet_addr.eq_any(associated_wallets))
+            .select(known_credited_wallets::all_columns)
+            .get_results(&mut self.conn)?)
+    }
 }
