@@ -6,13 +6,14 @@ use uuid::Uuid;
 
 use crate::{
     case_report::case_report::CaseReport,
-    database::models::{KnownDiscreditedWallet, WalletReport},
+    database::models::{KnownCreditedWallet, KnownDiscreditedWallet, WalletReport},
     reputation::reputation::Reputation,
     wallet::wallet::Wallet,
     worker::worker::WalletReportWorker,
 };
 
 const DISCREDITED_SCORE_RATING_BOUNDARY: i32 = 400;
+const CREDITED_SCORE_RATING_BOUNDARY: i32 = 800;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct WalletReportJob {
@@ -88,6 +89,10 @@ impl WalletReportJob {
             worker
                 .database
                 .insert_discredited_wallet(KnownDiscreditedWallet::new(self.wallet_addr.clone()))?
+        } else if reputation.rating_score > CREDITED_SCORE_RATING_BOUNDARY {
+            worker
+                .database
+                .insert_credited_wallet(KnownCreditedWallet::new(self.wallet_addr.clone()))?
         }
 
         info!(
