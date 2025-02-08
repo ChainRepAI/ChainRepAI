@@ -19,7 +19,12 @@ impl KnownDiscreditedAssociates {
                     .transaction
                     .decode()
                     .map_or_else(Vec::new, |versioned_tx| {
-                        versioned_tx.message.static_account_keys().iter().map(|key| key.to_string()).collect()
+                        versioned_tx
+                            .message
+                            .static_account_keys()
+                            .iter()
+                            .map(|key| key.to_string())
+                            .collect()
                     })
             })
             .collect();

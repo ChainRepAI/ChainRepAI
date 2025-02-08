@@ -11,8 +11,13 @@ use uuid::Uuid;
 use crate::case_report::case_report::CaseReport;
 
 use super::{
-    models::{KnownCreditedWallet, KnownDiscreditedWallet, RatingClassification, User, WalletMetrics, WalletReport},
-    schema::{known_credited_wallets, known_discredited_wallets, users, wallet_metrics, wallet_report},
+    models::{
+        KnownCreditedWallet, KnownDiscreditedWallet, RatingClassification, User, WalletMetrics,
+        WalletReport,
+    },
+    schema::{
+        known_credited_wallets, known_discredited_wallets, users, wallet_metrics, wallet_report,
+    },
 };
 
 pub struct Database {
@@ -288,7 +293,7 @@ impl Database {
 
     pub fn find_credited_associates(
         &mut self,
-        associated_wallets: Vec<String>
+        associated_wallets: Vec<String>,
     ) -> Result<Vec<KnownCreditedWallet>> {
         Ok(known_credited_wallets::table
             .filter(known_credited_wallets::wallet_addr.eq_any(associated_wallets))
